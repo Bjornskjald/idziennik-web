@@ -1,0 +1,16 @@
+footer.page-footer.teal
+	.container
+		.row
+			.col.l3.s12
+				a.white-text(href='https://github.com/Bjornskjald/idziennik-web/') idziennik-web na GitHubie
+	.footer-copyright
+		.container Made by Bjornskjald
+script(src='https://code.jquery.com/jquery-3.2.1.min.js')
+script(src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/js/materialize.min.js')
+script.
+	(function($){
+		$(function(){
+			$('.button-collapse').sideNav();
+			$(".dropdown-button").dropdown();
+		});
+	})(jQuery);

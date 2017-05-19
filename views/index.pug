@@ -1,0 +1,18 @@
+doctype html
+html(lang="pl")
+	include head.pug
+	body
+		include header.pug
+		+nav-notloggedin('index')
+		main
+			.container
+				br
+				br
+				h1.header.center.teal-text iDziennik
+				.row.center
+					h5.header.col.s12.light Frontend modułu Node.js "idziennik"
+				.row.center
+					a#download-button.btn-large.waves-effect.waves-light.teal(href='/login/') Zaloguj się
+				br
+				br
+		include footer.pug

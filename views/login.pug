@@ -1,0 +1,19 @@
+doctype html
+html(lang="pl")
+	include head.pug
+	body
+		include header.pug
+		+nav-notloggedin('login')
+		main
+			.container
+				.section(style="margin-top: 30px")
+					.chip #{status}
+					form(action='/login/', method='POST')
+						.input-field
+							input(id="username", name="username", type="text")
+							label(for="username") Nazwa użytkownika
+						.input-field
+							input(id="password", name="password", type="password")
+							label(for="password") Hasło
+						input(type="submit", class="btn waves-effect waves-light", value="Zaloguj")
+		include footer.pug
