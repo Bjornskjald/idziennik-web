@@ -10,7 +10,7 @@ var data = {};
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.set('view engine', 'pug')
-app.listen(80, () => {
+app.listen(8080, () => {
 	console.log('App is listening on port 80.')
 })
 
