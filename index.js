@@ -10,6 +10,9 @@ var data = {};
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.set('view engine', 'pug')
+app.listen(80, () => {
+	console.log('App is listening on port 80.')
+})
 
 app.get('*', (req, res) => {
 	res.status(404).sendFile('./res/404.html')
