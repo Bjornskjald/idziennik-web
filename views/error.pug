@@ -1,0 +1,12 @@
+doctype html
+html(lang="pl")
+	include head.pug
+	body
+		include header.pug
+		+nav-notloggedin()
+		main
+			.container
+				.section
+					h5 Error
+					p Wystąpił błąd: #{error}
+		include footer.pug

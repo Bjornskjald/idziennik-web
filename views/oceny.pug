@@ -1,0 +1,25 @@
+doctype html
+html(lang="pl")
+	include head.pug
+	body
+		include header.pug
+		+nav('oceny')
+		main
+			.container
+				.section
+					h5 Twoja średnia: #{srednia}
+					a(class="btn waves-effect waves-light", href="/oceny/?filtr=1") Ostatni miesiąc 
+					a(class="btn waves-effect waves-light", href="/oceny/") Wszystkie
+					form(method="get", action="/oceny/")
+						.input-field.inline
+							input(name="szukaj")#searchbox
+						button(class="btn waves-effect waves-light", type="submit") Szukaj
+					br
+					table.striped(style="margin-top: 10px")
+						each val, index in result
+							tr 
+								td= index
+								td.oceny!= val.oceny
+								td.przedmiot!= val.srednia
+								td.przedmiot!= val.srednianum
+		include footer.pug
