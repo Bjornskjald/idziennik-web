@@ -66,7 +66,147 @@ app.get('/pulpit/', (req, res) => {
 		res.redirect('/')
 		return
 	}
-	res.render('pulpit', {name: req.cookies.username})
+	var d = {lekcje: {arr: []}, sprawdziany: {arr: []}, zadania: {arr: []}, wydarzenia: {arr: []}}
+	var j = d
+	data[req.cookies.username].client.plan(new Date()).then(plan => {
+		d.dzien = new Date().getDay() === 0 ? 7 : new Date().getDay()
+		j.dzien = d.dzien+1
+		plan.Przedmioty.forEach(lekcja => {
+			if(lekcja.DzienTygodnia === d.dzien){
+				d.lekcje.arr.push(lekcja.Godzina+'. '+lekcja.Skrot)
+			}
+			if(lekcja.DzienTygodnia === j.dzien){
+				j.lekcje.arr.push(lekcja.Godzina+'. '+lekcja.Skrot)
+			}
+		})
+		if(d.lekcje.arr.length === 0){
+			d.lekcje.str = 'Brak lekcji'
+		} else {
+			d.lekcje.str = d.lekcje.arr.join('<br />')
+			d.lekcje.str = 'Lekcje: <br />' + d.lekcje.str
+		}
+		if(d.dzien === 7){
+			// Trzeba powtórzyć żądanie żeby pobrać plan na następny dzień (poniedziałek)
+			return data[req.cookies.username].client.plan(new Date(new Date().getTime()+86400000))
+		} else {
+			if(j.lekcje.arr.length === 0){
+				j.lekcje.str = 'Brak lekcji'
+			} else {
+				j.lekcje.str = j.lekcje.arr.join('<br />')
+				j.lekcje.str = 'Lekcje: <br />' + j.lekcje.str
+			}
+			return
+		}
+	}).then(plan => {
+		if(typeof j.lekcje.str !== 'string'){
+			plan.Przedmioty.forEach(lekcja => {
+				if(lekcja.DzienTygodnia === j.dzien){
+					j.lekcje.arr.push(lekcja.Godzina+'. '+lekcja.Skrot)
+				}
+			})
+			if(j.lekcje.arr.length === 0){
+				j.lekcje.str = 'Brak lekcji'
+			} else {
+				j.lekcje.str = j.lekcje.arr.join('<br />')
+				j.lekcje.str = 'Lekcje: <br />' + j.lekcje.str
+			}
+		}
+		return data[req.cookies.username].client.sprawdziany(new Date())
+	}).then(sprawdziany => {
+		d.date = new Date();
+		d.date.setHours(d.date.getHours() - d.date.getTimezoneOffset() / 60);
+		j.date = new Date(new Date().getTime()+86400000)
+		j.date.setHours(j.date.getHours() - j.date.getTimezoneOffset() / 60);
+		sprawdziany.ListK.forEach(sprawdzian => {
+			if(sprawdzian.data === d.date.toJSON().split('T')[0]){
+				d.sprawdziany.arr.push(sprawdzian.rodzaj + ' - ' + sprawdzian.rodzaj + ': ' + sprawdzian.zakres)
+			}
+			if(sprawdzian.data === j.date.toJSON().split('T')[0]){
+				j.sprawdziany.arr.push(sprawdzian.rodzaj + ' - ' + sprawdzian.rodzaj + ': ' + sprawdzian.zakres)
+			}
+		})
+		if(d.sprawdziany.arr.length === 0){
+			d.sprawdziany.str = 'Brak sprawdzianów'
+		} else {
+			d.sprawdziany.str = d.sprawdziany.arr.join('<br />')
+			d.sprawdziany.str = 'Sprawdziany: <br />'+d.sprawdziany.str
+		}
+		if(j.date.getDate() === 1){
+			return data[req.cookies.username].client.sprawdziany(j.date())
+		} else {
+			if(j.sprawdziany.arr.length === 0){
+				j.sprawdziany.str = 'Brak sprawdzianów'
+			} else {
+				j.sprawdziany.str = j.sprawdziany.arr.join('<br />')
+				j.sprawdziany.str = 'Sprawdziany: <br />'+j.sprawdziany.str
+			}
+			return
+		}
+	}).then(sprawdziany => {
+		if(typeof d.sprawdziany.str !== 'string'){
+			sprawdziany.ListK.forEach(sprawdzian => {
+				if(sprawdzian.data === d.date.toJSON().split('T')[0]){
+					d.sprawdziany.arr.push(sprawdzian.rodzaj + ' - ' + sprawdzian.rodzaj + ': ' + sprawdzian.zakres)
+				}
+				if(sprawdzian.data === j.date.toJSON().split('T')[0]){
+					j.sprawdziany.arr.push(sprawdzian.rodzaj + ' - ' + sprawdzian.rodzaj + ': ' + sprawdzian.zakres)
+				}
+			})
+			if(j.sprawdziany.arr.length === 0){
+				j.sprawdziany.str = 'Brak sprawdzianów'
+			} else {
+				j.sprawdziany.str = j.sprawdziany.arr.join('<br />')
+				j.sprawdziany.str = 'Sprawdziany: <br />'+j.sprawdziany.str
+			}
+		}
+		return data[req.cookies.username].client.praceDomowe()
+	}).then(zadania => {
+		zadania.ListK.forEach(zadanie => {
+			if(zadanie.dataO === d.date.toJSON().split('T')[0]){
+				d.zadania.arr.push(zadanie.przed + ': ' + zadanie.tytul)
+			}
+			if(zadanie.dataO === j.date.toJSON().split('T')[0]){
+				j.zadania.arr.push(zadanie.przed + ': ' + zadanie.tytul)
+			}
+			if(d.zadania.arr.length === 0){
+				d.zadania.str = 'Brak zadań domowych'
+			} else {
+				d.zadania.str = d.zadania.arr.join('<br />')
+				d.zadania.str = 'Zadania: <br />'+d.zadania.str
+			}
+			if(j.zadania.arr.length === 0){
+				j.zadania.str = 'Brak zadań domowych'
+			} else {
+				j.zadania.str = j.zadania.arr.join('<br />')
+				j.zadania.str = 'Zadania: <br />'+j.zadania.str
+			}
+		})
+		return data[req.cookies.username].client.wydarzenia()
+	}).then(wydarzenia => {
+		wydarzenia.ListK.forEach(wydarzenie => {
+			if(wydarzenie.data === d.date.toJSON().split('T')[0]){
+				d.wydarzenia.arr.push(wydarzenie.info)
+			}
+			if(wydarzenie.data === j.date.toJSON().split('T')[0]){
+				j.wydarzenia.arr.push(wydarzenie.info)
+			}
+			if(d.wydarzenia.arr.length === 0){
+				d.wydarzenia.str = 'Brak wydarzeń'
+			} else {
+				d.wydarzenia.str = d.wydarzenia.arr.join('<br />')
+				d.wydarzenia.str = 'Wydarzenia: <br />'+d.wydarzenia.str
+			}
+			if(j.wydarzenia.arr.length === 0){
+				j.wydarzenia.str = 'Brak wydarzeń'
+			} else {
+				j.wydarzenia.str = j.wydarzenia.arr.join('<br />')
+				j.wydarzenia.str = 'Wydarzenia: <br />'+j.wydarzenia.str
+			}
+		})
+		res.render('pulpit', {name: req.cookies.username, d: d, j: j})
+	}).catch(err => {
+		res.render('error', {error: err})
+	})
 })
 
 app.get('/oceny/', (req, res) => {
@@ -75,7 +215,7 @@ app.get('/oceny/', (req, res) => {
 		return
 	}
 	data[req.cookies.username].client.oceny().then(result => {
-		var Srednia = 0, SredniaCounter = 0
+		var srednia = 0, sredniaCounter = 0
 		var list = {}
 		result.Przedmioty.forEach(przedmiot => {
 			var tmp = []
@@ -99,11 +239,11 @@ app.get('/oceny/', (req, res) => {
 				oceny: tmp.join(' '),
 				srednia: przedmiot.SrednieCaloroczne,
 				srednianum: markToInt(parseInt(przedmiot.SrednieCaloroczne, 10))}
-			Srednia += markToInt(parseInt(przedmiot.SrednieCaloroczne, 10))
-			SredniaCounter++
+			srednia += markToInt(parseInt(przedmiot.SrednieCaloroczne, 10))
+			sredniaCounter++
 		})
-		Srednia = Math.round(Srednia / SredniaCounter * 100) / 100
-		res.render('oceny', { result: list, name: req.cookies.username, srednia: Srednia})
+		srednia = Math.round(srednia / sredniaCounter * 100) / 100
+		res.render('oceny', { result: list, name: req.cookies.username, srednia: srednia})
 	}).catch(err => {
 		if(err.toString().toLowerCase().includes('authentication')){
 			var index = data[req.cookies.username].tokens.indexOf(req.cookies.token)

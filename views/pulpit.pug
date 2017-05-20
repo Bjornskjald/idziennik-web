@@ -1,9 +1,47 @@
 doctype html
 html(lang="pl")
 	include head.pug
+	+head('Pulpit')
 	body
 		include header.pug
 		+nav('pulpit')
 		main
-			h1 Dashboard
+			.container
+				.section
+					h5 Witaj, #{name}
+					.row
+						.col.s12.m6
+							.card.teal.darken-1
+								.card-content.white-text
+									span.card-title Dzisiaj
+									p
+										span!= d.lekcje.str
+										br
+										span!= d.sprawdziany.str
+										br
+										span!= d.zadania.str
+										br
+										span!= d.wydarzenia.str
+								.card-action(style="display: flex; flex-wrap: wrap")
+									a(href="/plan/") Plan
+									a(href="/sprawdziany/") Sprawdziany
+									a(href="/zadania/") Zadania
+									a(href="/wydarzenia/") Wydarzenia
+						.col.s12.m6
+							.card.teal.darken-1
+								.card-content.white-text
+									span.card-title Jutro
+									p
+										span!= j.lekcje.str
+										br
+										span!= j.sprawdziany.str
+										br
+										span!= j.zadania.str
+										br
+										span!= j.wydarzenia.str
+								.card-action(style="display: flex; flex-wrap: wrap")
+									a(href="/plan/") Plan
+									a(href="/sprawdziany/") Sprawdziany
+									a(href="/zadania/") Zadania
+									a(href="/wydarzenia/") Wydarzenia
 		include footer.pug
