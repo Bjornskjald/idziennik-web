@@ -16,7 +16,7 @@ app.listen(8080, () => {
 })
 
 app.get('/', (req, res) => {
-	if(loggedIn(req, res)){
+	if(loggedIn(req)){
 		res.redirect('/pulpit/')
 		return
 	}
@@ -24,14 +24,14 @@ app.get('/', (req, res) => {
 })
 
 app.get('/login/', (req, res) => {
-	if(loggedIn(req, res)){
+	if(loggedIn(req)){
 		res.redirect('/pulpit/')
 	}
 	res.render('login', {status: 'Zaloguj się'})
 })
 
 app.post('/login/', (req, res) => {
-	if(loggedIn(req, res)){
+	if(loggedIn(req)){
 		res.redirect('/pulpit/')
 		return
 	}
@@ -62,26 +62,35 @@ app.post('/login/', (req, res) => {
 })
 
 app.get('/pulpit/', (req, res) => {
-	if(!loggedIn(req, res)){
-		res.redirect('/')
+	if(!loggedIn(req)){
+		res.redirect('/login/')
 		return
 	}
 	var d = {lekcje: {arr: []}, sprawdziany: {arr: []}, zadania: {arr: []}, wydarzenia: {arr: []}}
-	var j = d
+	var j = {lekcje: {arr: []}, sprawdziany: {arr: []}, zadania: {arr: []}, wydarzenia: {arr: []}}
 	data[req.cookies.username].client.plan(new Date()).then(plan => {
 		d.dzien = new Date().getDay() === 0 ? 7 : new Date().getDay()
-		j.dzien = d.dzien+1
+		j.dzien = d.dzien === 7 ? 0 : d.dzien + 1
 		plan.Przedmioty.forEach(lekcja => {
 			if(lekcja.DzienTygodnia === d.dzien){
-				d.lekcje.arr.push(lekcja.Godzina+'. '+lekcja.Skrot)
+				if(lekcja.TypZastepstwa !== -1){
+					d.lekcje.arr.push(`<span style="text-decoration: line-through">${lekcja.Godzina}. ${lekcja.Nazwa}</span>`)
+				} else {
+					d.lekcje.arr.push(`${lekcja.Godzina}. ${lekcja.Nazwa}`)
+				}
 			}
-			if(lekcja.DzienTygodnia === j.dzien){
-				j.lekcje.arr.push(lekcja.Godzina+'. '+lekcja.Skrot)
+			if(d.dzien !== 7 && lekcja.DzienTygodnia === j.dzien){
+				if(lekcja.TypZastepstwa !== -1){
+					j.lekcje.arr.push(`<span style="text-decoration: line-through">${lekcja.Godzina}. ${lekcja.Nazwa}</span>`)
+				} else {
+					j.lekcje.arr.push(`${lekcja.Godzina}. ${lekcja.Nazwa}`)
+				}
 			}
 		})
 		if(d.lekcje.arr.length === 0){
 			d.lekcje.str = 'Brak lekcji'
 		} else {
+			d.lekcje.arr.push('')
 			d.lekcje.str = d.lekcje.arr.join('<br />')
 			d.lekcje.str = 'Lekcje: <br />' + d.lekcje.str
 		}
@@ -92,6 +101,7 @@ app.get('/pulpit/', (req, res) => {
 			if(j.lekcje.arr.length === 0){
 				j.lekcje.str = 'Brak lekcji'
 			} else {
+				j.lekcje.arr.push('')
 				j.lekcje.str = j.lekcje.arr.join('<br />')
 				j.lekcje.str = 'Lekcje: <br />' + j.lekcje.str
 			}
@@ -101,28 +111,33 @@ app.get('/pulpit/', (req, res) => {
 		if(typeof j.lekcje.str !== 'string'){
 			plan.Przedmioty.forEach(lekcja => {
 				if(lekcja.DzienTygodnia === j.dzien){
-					j.lekcje.arr.push(lekcja.Godzina+'. '+lekcja.Skrot)
+					if(lekcja.TypZastepstwa !== -1){
+						j.lekcje.arr.push(`<span style="text-decoration: line-through">${lekcja.Godzina}. ${lekcja.Nazwa}</span>`)
+					} else {
+						j.lekcje.arr.push(`${lekcja.Godzina}. ${lekcja.Nazwa}`)
+					}
 				}
 			})
 			if(j.lekcje.arr.length === 0){
 				j.lekcje.str = 'Brak lekcji'
 			} else {
+				j.lekcje.arr.push('')
 				j.lekcje.str = j.lekcje.arr.join('<br />')
 				j.lekcje.str = 'Lekcje: <br />' + j.lekcje.str
 			}
 		}
 		return data[req.cookies.username].client.sprawdziany(new Date())
 	}).then(sprawdziany => {
-		d.date = new Date();
-		d.date.setHours(d.date.getHours() - d.date.getTimezoneOffset() / 60);
+		d.date = new Date()
+		d.date.setHours(d.date.getHours() - d.date.getTimezoneOffset() / 60)
 		j.date = new Date(new Date().getTime()+86400000)
-		j.date.setHours(j.date.getHours() - j.date.getTimezoneOffset() / 60);
+		j.date.setHours(j.date.getHours() - j.date.getTimezoneOffset() / 60)
 		sprawdziany.ListK.forEach(sprawdzian => {
 			if(sprawdzian.data === d.date.toJSON().split('T')[0]){
-				d.sprawdziany.arr.push(sprawdzian.rodzaj + ' - ' + sprawdzian.rodzaj + ': ' + sprawdzian.zakres)
+				d.sprawdziany.arr.push(`${sprawdzian.rodzaj} - ${sprawdzian.rodzaj}: ${sprawdzian.zakres}`)
 			}
 			if(sprawdzian.data === j.date.toJSON().split('T')[0]){
-				j.sprawdziany.arr.push(sprawdzian.rodzaj + ' - ' + sprawdzian.rodzaj + ': ' + sprawdzian.zakres)
+				j.sprawdziany.arr.push(`${sprawdzian.rodzaj} - ${sprawdzian.rodzaj}: ${sprawdzian.zakres}`)
 			}
 		})
 		if(d.sprawdziany.arr.length === 0){
@@ -146,10 +161,10 @@ app.get('/pulpit/', (req, res) => {
 		if(typeof d.sprawdziany.str !== 'string'){
 			sprawdziany.ListK.forEach(sprawdzian => {
 				if(sprawdzian.data === d.date.toJSON().split('T')[0]){
-					d.sprawdziany.arr.push(sprawdzian.rodzaj + ' - ' + sprawdzian.rodzaj + ': ' + sprawdzian.zakres)
+					d.sprawdziany.arr.push(`${sprawdzian.rodzaj} - ${sprawdzian.rodzaj}: ${sprawdzian.zakres}`)
 				}
 				if(sprawdzian.data === j.date.toJSON().split('T')[0]){
-					j.sprawdziany.arr.push(sprawdzian.rodzaj + ' - ' + sprawdzian.rodzaj + ': ' + sprawdzian.zakres)
+					j.sprawdziany.arr.push(`${sprawdzian.rodzaj} - ${sprawdzian.rodzaj}: ${sprawdzian.zakres}`)
 				}
 			})
 			if(j.sprawdziany.arr.length === 0){
@@ -159,14 +174,14 @@ app.get('/pulpit/', (req, res) => {
 				j.sprawdziany.str = 'Sprawdziany: <br />'+j.sprawdziany.str
 			}
 		}
-		return data[req.cookies.username].client.praceDomowe()
+		return data[req.cookies.username].client.praceDomowe(new Date())
 	}).then(zadania => {
 		zadania.ListK.forEach(zadanie => {
 			if(zadanie.dataO === d.date.toJSON().split('T')[0]){
-				d.zadania.arr.push(zadanie.przed + ': ' + zadanie.tytul)
+				d.zadania.arr.push(`${zadanie.przed}: ${zadanie.tytul}`)
 			}
 			if(zadanie.dataO === j.date.toJSON().split('T')[0]){
-				j.zadania.arr.push(zadanie.przed + ': ' + zadanie.tytul)
+				j.zadania.arr.push(`${zadanie.przed}: ${zadanie.tytul}`)
 			}
 			if(d.zadania.arr.length === 0){
 				d.zadania.str = 'Brak zadań domowych'
@@ -205,13 +220,21 @@ app.get('/pulpit/', (req, res) => {
 		})
 		res.render('pulpit', {name: req.cookies.username, d: d, j: j})
 	}).catch(err => {
+		if(err.toString().toLowerCase().includes('authentication failed.')){
+			var index = data[req.cookies.username].tokens.indexOf(req.cookies.token)
+			delete data[req.cookies.username].tokens[index]
+			res.clearCookie('token')
+			res.clearCookie('username')
+			res.render('error', {error: 'Sesja wygasła. Zaloguj się ponownie'})
+			return
+		}
 		res.render('error', {error: err})
 	})
 })
 
 app.get('/oceny/', (req, res) => {
-	if(!loggedIn(req, res)){
-		res.redirect('/')
+	if(!loggedIn(req)){
+		res.redirect('/login/')
 		return
 	}
 	data[req.cookies.username].client.oceny().then(result => {
@@ -220,18 +243,18 @@ app.get('/oceny/', (req, res) => {
 		result.Przedmioty.forEach(przedmiot => {
 			var tmp = []
 			przedmiot.Oceny.forEach(ocena => {
-				var desc = 'Kategoria: '+ocena.Kategoria+'<br />Waga: '+ocena.Waga+'<br />Data: '+ocena.Data_wystaw
+				var desc = `Kategoria: ${ocena.Kategoria}<br />Waga: ${ocena.Waga}<br />Data: ${ocena.Data_wystaw}`
 				if(ocena.Typ === 0){
 					if(typeof req.query.filtr === 'string' && req.query.filtr === '1'){
 						if(Math.abs(new Date() - new Date(ocena.Data_wystaw.replace(/-/g, '/'))) < 2678400000){
-							tmp.push('<a href="#!" class="ocena" style="color:#'+ocena.Kolor+'" onclick="Materialize.toast(\''+desc+'\', 5000)">'+ocena.Ocena+'</a>')
+							tmp.push(`<a href="#!" class="ocena" style="color:#${ocena.Kolor}" onclick="Materialize.toast('${desc}', 5000)">${ocena.Ocena}</a>`)
 						}							
 					} else if(typeof req.query.szukaj === 'string') {
 						if(ocena.Kategoria.toLowerCase().includes(req.query.szukaj.toLowerCase()) || ocena.Ocena.toLowerCase().includes(req.query.szukaj.toLowerCase())){
-							tmp.push('<a href="#!" class="ocena" style="color:#'+ocena.Kolor+'" onclick="Materialize.toast(\''+desc+'\', 5000)">'+ocena.Ocena+'</a>')
+							tmp.push(`<a href="#!" class="ocena" style="color:#${ocena.Kolor}" onclick="Materialize.toast('${desc}', 5000)">${ocena.Ocena}</a>`)
 						}
 					} else {
-						tmp.push('<a href="#!" class="ocena" style="color:#'+ocena.Kolor+'" onclick="Materialize.toast(\''+desc+'\', 5000)">'+ocena.Ocena+'</a>')
+						tmp.push(`<a href="#!" class="ocena" style="color:#${ocena.Kolor}" onclick="Materialize.toast('${desc}', 5000)">${ocena.Ocena}</a>`)
 					}
 				}
 			})
@@ -245,19 +268,114 @@ app.get('/oceny/', (req, res) => {
 		srednia = Math.round(srednia / sredniaCounter * 100) / 100
 		res.render('oceny', { result: list, name: req.cookies.username, srednia: srednia})
 	}).catch(err => {
-		if(err.toString().toLowerCase().includes('authentication')){
+		if(err.toString().toLowerCase().includes('authentication failed.')){
 			var index = data[req.cookies.username].tokens.indexOf(req.cookies.token)
 			delete data[req.cookies.username].tokens[index]
 			res.clearCookie('token')
 			res.clearCookie('username')
-			res.render('error', {error: 'Błąd logowania. Zaloguj się ponownie'})
+			res.render('error', {error: 'Sesja wygasła. Zaloguj się ponownie'})
+			return
 		}
 		res.render('error', {error: err})
 	})
 })
 
+app.get('/plan/', (req, res) => {
+	if(!loggedIn(req)){
+		res.redirect('/login/')
+		return
+	}
+	var lekcje = [[], [], [], [], []]
+	var date = typeof req.query.date === 'string' ? new Date(req.query.date) : new Date()
+	data[req.cookies.username].client.plan(date).then(plan => {
+		var descBase = '<span style="color: #ff3300">'
+		plan.Przedmioty.forEach(lekcja => {
+			var tmp = []
+			tmp.push(lekcja.Nazwa.length < 15 ? lekcja.Nazwa : lekcja.Skrot)
+			switch(lekcja.TypZastepstwa){
+				case 0:
+					tmp.push(descBase + 'Odwołane</span>')
+					break
+				case 1:
+					tmp.push(descBase + 'Zastępstwo')
+					tmp.push(`(${lekcja.NauZastepujacy})</span>`)
+					break
+				case 2:
+					tmp.push(descBase + 'Zastępstwo')
+					tmp.push(`(${lekcja.NauZastepujacy} - ${lekcja.PrzedmiotZastepujacy})</span>`)
+					break
+				case 3:
+					tmp.push(descBase + 'Zastępstwo - inne')
+					tmp.push(`(${lekcja.NauZastepujacy})</span>`)
+					break
+				case 4:
+					tmp.push(descBase + 'Łączona')
+					tmp.push(`(${lekcja.NauZastepujacy})</span>`)
+					break
+				case 5:
+					tmp.push(descBase + 'Łączona - inna')
+					tmp.push(`(${lekcja.NauZastepujacy} - ${lekcja.PrzedmiotZastepujacy})</span>`)
+					break
+			}
+			lekcje[lekcja.DzienTygodnia-1][lekcja.Godzina] = tmp.join('<br />')
+		})
+		res.render('plan', {name: req.cookies.username, lekcje: lekcje, godziny: plan.GodzinyLekcyjne})
+	}).catch(err => {
+		if(err.toString().toLowerCase().includes('authentication failed.')){
+			var index = data[req.cookies.username].tokens.indexOf(req.cookies.token)
+			delete data[req.cookies.username].tokens[index]
+			res.clearCookie('token')
+			res.clearCookie('username')
+			res.render('error', {error: 'Sesja wygasła. Zaloguj się ponownie'})
+			return
+		}
+		res.render('error', {error: err})
+	})
+})
+
+app.get('/zadania/', (req, res) => {
+	if(!loggedIn(req)){
+		res.redirect('/login/')
+		return
+	}
+	var date = new Date()
+	var list = []
+	data[req.cookies.username].client.praceDomowe(date).then(zadania => {
+		zadania.ListK.forEach(zadanie => {
+			list.push({
+				dataZ: zadanie.dataZ,
+				dataO: zadanie.dataO,
+				temat: `<a href="/zadanie/?id=${zadanie._recordId}">${zadanie.tytul}</a>`,
+				przedmiot: zadanie.przed
+			})
+		})
+		res.render('zadania', {name: req.cookies.username, list: list})
+	}).catch(err => {
+		if(err.toString().toLowerCase().includes('authentication failed.')){
+			var index = data[req.cookies.username].tokens.indexOf(req.cookies.token)
+			delete data[req.cookies.username].tokens[index]
+			res.clearCookie('token')
+			res.clearCookie('username')
+			res.render('error', {error: 'Sesja wygasła. Zaloguj się ponownie'})
+			return
+		}
+		res.render('error', {error: err})
+	})
+})
+
+app.get('/zadanie/', (req, res) => {
+	if(!loggedIn(req) || )
+	if(typeof req.query.id !== 'string'){
+		console.log(typeof req.query.id)
+		res.redirect('/pulpit/')
+	} else {
+		console.log('jest to string')
+		res.redirect('/pulpit/')
+	}
+})
+
 app.get('/logout/', (req, res) => {
-	if(loggedIn(req, res)){
+	if(loggedIn(req)){
 		var index = data[req.cookies.username].tokens.indexOf(req.cookies.token)
 		delete data[req.cookies.username].tokens[index]
 		res.clearCookie('token')
@@ -270,7 +388,7 @@ app.get('*', (req, res) => {
 	res.status(404).sendFile(path.join(__dirname, 'res', '404.html'))
 })
 
-function loggedIn(req, res){
+function loggedIn(req){
 	return (typeof req.cookies.token === 'string' && typeof req.cookies.username === 'string' && typeof data[req.cookies.username] === 'object' && data[req.cookies.username].tokens.includes(req.cookies.token))
 }
 
