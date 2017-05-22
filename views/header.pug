@@ -6,15 +6,31 @@ mixin nav(page)
 				ul.right.hide-on-med-and-down
 					li(class=page === 'pulpit' ? 'active' : undefined)
 						a.white-text(href='/pulpit/') Pulpit
+
 					li(class=page === 'oceny' ? 'active' : undefined)
 						a.white-text(href='/oceny/') Oceny
+
+					li(class=page === 'plan' ? 'active' : undefined)
+						a.white-text(href='/plan/') Plan
+
+					li(class=page === 'zadania' ? 'active' : undefined)
+						a.white-text(href='/zadania/') Zadania
+
 					li
 						a.white-text(href='/logout/') Wyloguj #{name}
 				ul#nav-mobile.side-nav
 					li(class=page === 'pulpit' ? 'active' : undefined)
 						a(href='/pulpit/') Pulpit
+
 					li(class=page === 'oceny' ? 'active' : undefined)
 						a(href='/oceny/') Oceny
+
+					li(class=page === 'plan' ? 'active' : undefined)
+						a(href='/plan/') Plan
+
+					li(class=page === 'zadania' ? 'active' : undefined)
+						a(href='/zadania/') Zadania
+						
 					li
 						a(href='/logout/') Wyloguj #{name}
 					|  
