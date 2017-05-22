@@ -1,0 +1,23 @@
+doctype html
+html(lang='en')
+	include templates/head.pug
+	+head('Obecnosci')
+	body
+		include templates/header.pug
+		+nav('obecnosci')
+		main
+			.container
+				.section
+					table.striped
+						each tydzien in tygodnie
+							tr
+								each dzien in tydzien
+									td(style="vertical-align: top")
+										if typeof dzien !== 'null' && typeof dzien !== 'undefined'
+											each lekcja in dzien
+												if typeof lekcja !== 'null' && typeof lekcja !== 'undefined'
+													span(style="background-color: "+lekcja.color)= lekcja.opis
+												br
+
+					p!= JSON.stringify(obecnosci)
+		include templates/footer.pug

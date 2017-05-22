@@ -393,6 +393,65 @@ app.get('/zadanie/', (req, res) => {
 	})
 })
 
+app.get('/obecnosci/', (req, res) => {
+	if(!loggedIn(req)){
+		res.redirect('/login/')
+		return
+	}
+	var miesiac = []
+	var offset = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getDay()
+	if(offset === 0){
+		offset = 7
+	} else {
+		offset--
+	}
+	for(var i = 0; i < offset; i++){
+		miesiac.push([])
+	}
+	data[req.cookies.username].client.obecnosci(new Date()).then(obecnosci => {
+		obecnosci.Obecnosci.forEach(lekcja => {
+			delete lekcja.__type
+			delete lekcja.IdRegisterPosition
+			switch(lekcja.TypObecnosci){
+				case 'T':
+					var color = '#CCFFCC' // zielony
+					break
+				case 'N':
+					var color = '#FFAD99' // czerwony
+					break
+				case 'F':
+				case 'B':
+					var color = '#E3E3E3' // szary
+					break
+				case 'S':
+					var color = '#FFFFAA' // żółty
+					break
+				case 'U':
+					var color = '#FFE099' // pomarańczowy
+					break
+				case 'Z':
+					var color = '#A8BEFF' // niebieski
+					break
+				case 'ZO':
+					var color = '#FF69B4' // fioletowy
+					break
+			}
+			if(typeof miesiac[lekcja.Dzien - 1 + offset] !== 'object'){
+				miesiac[lekcja.Dzien - 1 + offset] = []
+			}
+			miesiac[lekcja.Dzien - 1 + offset][lekcja.Godzina-1] = {
+				opis: `${lekcja.Godzina}. ${lekcja.Przedmiot}`,
+				color: color
+			}
+		})
+		var tygodnie = []
+		for(var j = 0; j < miesiac.length; j += 7){
+			tygodnie.push(miesiac.slice(j, j+7))
+		}
+		res.render('obecnosci', {name: req.cookies.username, tygodnie: tygodnie})
+	})
+})
+
 app.get('/logout/', (req, res) => {
 	if(loggedIn(req)){
 		var index = data[req.cookies.username].tokens.indexOf(req.cookies.token)
