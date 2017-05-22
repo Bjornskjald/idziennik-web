@@ -345,8 +345,8 @@ app.get('/zadania/', (req, res) => {
 			list.push({
 				dataZ: zadanie.dataZ,
 				dataO: zadanie.dataO,
-				temat: `<a href="/zadanie/?id=${zadanie._recordId}">${zadanie.tytul}</a>`,
-				przedmiot: zadanie.przed
+				przedmiot: zadanie.przed,
+				temat: `<a href="/zadanie/?id=${zadanie._recordId}">${zadanie.tytul}</a>`
 			})
 		})
 		res.render('zadania', {name: req.cookies.username, list: list})
@@ -364,14 +364,33 @@ app.get('/zadania/', (req, res) => {
 })
 
 app.get('/zadanie/', (req, res) => {
-	if(!loggedIn(req) || )
-	if(typeof req.query.id !== 'string'){
-		console.log(typeof req.query.id)
-		res.redirect('/pulpit/')
-	} else {
-		console.log('jest to string')
-		res.redirect('/pulpit/')
+	if(!loggedIn(req)){
+		res.redirect('/login/')
+		return
 	}
+	if(typeof req.query.id !== 'string'){
+		res.redirect('/zadania/')
+	}
+	data[req.cookies.username].client.pracaDomowa(req.query.id).then(zadanie => {
+		zadanie = zadanie.praca
+		var tmp = []
+		tmp.push(`Tytuł: ${zadanie.tytul}`)
+		tmp.push(`Przedmiot: ${zadanie.przedNazwa}`)
+		tmp.push(`Data zadania: ${zadanie.dataZ}`)
+		tmp.push(`Data oddania: ${zadanie.dataO}`)
+		tmp.push(`Treść: ${zadanie.tresc.replace('\n', '<br />')}`)
+		res.render('zadanie', {name: req.cookies.username, zadanie: tmp.join('<br />')})
+	}).catch(err => {
+		if(err.toString().toLowerCase().includes('authentication failed.')){
+			var index = data[req.cookies.username].tokens.indexOf(req.cookies.token)
+			delete data[req.cookies.username].tokens[index]
+			res.clearCookie('token')
+			res.clearCookie('username')
+			res.render('error', {error: 'Sesja wygasła. Zaloguj się ponownie'})
+			return
+		}
+		res.render('error', {error: err})
+	})
 })
 
 app.get('/logout/', (req, res) => {
