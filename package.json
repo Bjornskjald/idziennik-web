@@ -24,7 +24,7 @@
     "chance": "^1.0.8",
     "cookie-parser": "^1.4.3",
     "express": "^4.15.3",
-    "idziennik": "^2.1.2",
+    "idziennik": "^2.2.2",
     "pug": "^2.0.0-rc.1"
   }
 }
