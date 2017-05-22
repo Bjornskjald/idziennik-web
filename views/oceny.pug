@@ -1,9 +1,9 @@
 doctype html
 html(lang="pl")
-	include head.pug
+	include templates/head.pug
 	+head('Oceny')
 	body
-		include header.pug
+		include templates/header.pug
 		+nav('oceny')
 		main
 			.container
@@ -23,4 +23,4 @@ html(lang="pl")
 								td.oceny!= val.oceny
 								td.przedmiot!= val.srednia
 								td.przedmiot!= val.srednianum
-		include footer.pug
+		include templates/footer.pug

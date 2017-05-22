@@ -1,9 +1,9 @@
 doctype html
 html(lang="pl")
-	include head.pug
+	include templates/head.pug
 	+head('iDziennik')
 	body
-		include header.pug
+		include templates/header.pug
 		+nav-notloggedin('glowna')
 		main
 			.container
@@ -16,4 +16,4 @@ html(lang="pl")
 					a#download-button.btn-large.waves-effect.waves-light.teal(href='/login/') Zaloguj się
 				br
 				br
-		include footer.pug
+		include templates/footer.pug

@@ -1,9 +1,9 @@
 doctype html
 html(lang="pl")
-	include head.pug
+	include templates/head.pug
 	+head('Pulpit')
 	body
-		include header.pug
+		include templates/header.pug
 		+nav('pulpit')
 		main
 			.container
@@ -44,4 +44,4 @@ html(lang="pl")
 									a(href="/sprawdziany/") Sprawdziany
 									a(href="/zadania/") Zadania
 									a(href="/wydarzenia/") Wydarzenia
-		include footer.pug
+		include templates/footer.pug

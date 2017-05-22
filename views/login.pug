@@ -1,9 +1,9 @@
 doctype html
 html(lang="pl")
-	include head.pug
+	include templates/head.pug
 	+head('Zaloguj się')
 	body
-		include header.pug
+		include templates/header.pug
 		+nav-notloggedin('zaloguj')
 		main
 			.container
@@ -17,4 +17,4 @@ html(lang="pl")
 							input(id="password", name="password", type="password")
 							label(for="password") Hasło
 						input(type="submit", class="btn waves-effect waves-light", value="Zaloguj")
-		include footer.pug
+		include templates/footer.pug

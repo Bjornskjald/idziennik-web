@@ -1,9 +1,9 @@
 doctype html
 html(lang='en')
-	include head.pug
+	include templates/head.pug
 	+head('Zadanie')
 	body
-		include header.pug
+		include templates/header.pug
 		+nav('zadania')
 		main
 			.container
@@ -11,4 +11,4 @@ html(lang='en')
 					p!= zadanie
 					p
 						a(href="/zadania/") Powrót
-		include footer.pug
+		include templates/footer.pug

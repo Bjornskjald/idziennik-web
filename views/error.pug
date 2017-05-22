@@ -1,9 +1,9 @@
 doctype html
 html(lang="pl")
-	include head.pug
+	include templates/head.pug
 	+head('Error')
 	body
-		include header.pug
+		include templates/header.pug
 		+nav-notloggedin()
 		main
 			.container
@@ -11,4 +11,4 @@ html(lang="pl")
 					h5 Error
 					p Wystąpił błąd: 
 						span= error
-		include footer.pug
+		include templates/footer.pug

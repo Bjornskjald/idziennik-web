@@ -1,9 +1,9 @@
 doctype html
 html(lang='en')
-	include head.pug
+	include templates/head.pug
 	+head('Plan')
 	body
-		include header.pug
+		include templates/header.pug
 		+nav('plan')
 		main
 			.container
@@ -25,4 +25,4 @@ html(lang='en')
 								td!= lekcje[3][val]
 								td!= lekcje[4][val]
 						- }
-		include footer.pug
+		include templates/footer.pug

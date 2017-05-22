@@ -1,9 +1,9 @@
 doctype html
 html(lang='en')
-	include head.pug
+	include templates/head.pug
 	+head('Zadania')
 	body
-		include header.pug
+		include templates/header.pug
 		+nav('zadania')
 		main
 			.container
@@ -15,4 +15,4 @@ html(lang='en')
 								td!= zadanie.dataZ
 								td!= zadanie.dataO
 								td!= zadanie.temat
-		include footer.pug
+		include templates/footer.pug
