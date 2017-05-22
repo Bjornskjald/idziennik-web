@@ -1,0 +1,18 @@
+doctype html
+html(lang='en')
+	include head.pug
+	+head('Zadania')
+	body
+		include header.pug
+		+nav('zadania')
+		main
+			.container
+				.section
+					table.striped
+						each zadanie in list
+							tr
+								td!= zadanie.przedmiot
+								td!= zadanie.dataZ
+								td!= zadanie.dataO
+								td!= zadanie.temat
+		include footer.pug

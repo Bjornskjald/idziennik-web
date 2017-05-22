@@ -1,0 +1,14 @@
+doctype html
+html(lang='en')
+	include head.pug
+	+head('Zadanie')
+	body
+		include header.pug
+		+nav('zadania')
+		main
+			.container
+				.section
+					p!= zadanie
+					p
+						a(href="/zadania/") Powrót
+		include footer.pug
