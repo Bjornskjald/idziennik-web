@@ -9,6 +9,11 @@ html(lang='en')
 			.container
 				.section
 					table.striped
+						tr
+							th Przedmiot
+							th Data zadania
+							th Data oddania
+							th Temat
 						each zadanie in list
 							tr
 								td!= zadanie.przedmiot
