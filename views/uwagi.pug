@@ -1,0 +1,39 @@
+doctype html
+html(lang='en')
+	include templates/head.pug
+	+head('Uwagi')
+	body
+		include templates/header.pug
+		+nav('uwagi')
+		main
+			.container
+				.section
+					h5 Suma punktów: #{punkty}
+					br
+					a(class="btn waves-effect waves-light", href="/uwagi/?filtr=p") Pozytywne
+					a(class="btn waves-effect waves-light", href="/uwagi/?filtr=n") Negatywne
+					a(class="btn waves-effect waves-light", href="/uwagi/?filtr=o") Neutralne
+					a(class="btn waves-effect waves-light", href="/uwagi/") Wszystkie
+					br
+					br
+					table.striped
+						tr
+							th Data wystawienia
+							th Nauczyciel
+							th Treść
+							th Punkty
+						each uwaga in uwagi
+							if typeof filtr === 'string'
+								if uwaga.Typ === filtr
+									tr(style="background-color:"+uwaga.color)
+										td= uwaga.Data
+										td(style="white-space: nowrap")= uwaga.Nauczyciel
+										td= uwaga.Tresc
+										td= uwaga.Punkty
+							else
+								tr(style="background-color:"+uwaga.color)
+									td= uwaga.Data
+									td(style="white-space: nowrap")= uwaga.Nauczyciel
+									td= uwaga.Tresc
+									td= uwaga.Punkty
+		include templates/footer.pug

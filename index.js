@@ -452,6 +452,34 @@ app.get('/obecnosci/', (req, res) => {
 	})
 })
 
+app.get('/uwagi/', (req, res) => {
+	if(!loggedIn(req)){
+		res.redirect('/login/')
+		return
+	}
+	if(typeof req.query.filtr === 'string'){
+		var filtr = req.query.filtr
+	}
+	data[req.cookies.username].client.uwagi().then(uwagi => {
+		var counter = uwagi.Poczatkowa
+		uwagi.SUwaga.forEach(uwaga => {
+			counter += parseInt(uwaga.Punkty, 10)
+			switch(uwaga.Typ){
+				case 'o':
+					uwaga.color = 'rgb(255, 255, 214)'
+					break
+				case 'n':
+					uwaga.color = 'rgb(255, 214, 214)'
+					break
+				case 'p':
+					uwaga.color = 'rgb(214, 255, 214)'
+					break
+			}
+		})
+		res.render('uwagi', {name: req.cookies.username, uwagi: uwagi.SUwaga, punkty: counter, filtr: filtr})
+	})
+})
+
 app.get('/logout/', (req, res) => {
 	if(loggedIn(req)){
 		var index = data[req.cookies.username].tokens.indexOf(req.cookies.token)
@@ -467,7 +495,7 @@ app.get('*', (req, res) => {
 })
 
 function loggedIn(req){
-	return (typeof req.cookies.token === 'string' && typeof req.cookies.username === 'string' && typeof data[req.cookies.username] === 'object' && data[req.cookies.username].tokens.includes(req.cookies.token))
+	return (typeof req.cookies.token === 'string' && typeof req.cookies.username === 'string' && typeof data[req.cookies.username] === 'object' && data[req.cookies.username].tokens.includes(req.cookies.token) && typeof data[req.cookies.username].client === 'object')
 }
 
 function markToInt(ocena){

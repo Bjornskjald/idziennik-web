@@ -20,6 +20,10 @@ mixin nav(page)
 					li(class=page === 'obecnosci' ? 'active' : undefined)
 						a.white-text(href='/obecnosci/') Obecności
 
+
+					li(class=page === 'uwagi' ? 'active' : undefined)
+						a.white-text(href='/uwagi/') Uwagi
+
 					li
 						a.white-text(href='/logout/') Wyloguj #{name}
 				ul#nav-mobile.side-nav
@@ -38,6 +42,10 @@ mixin nav(page)
 
 					li(class=page === 'obecnosci' ? 'active' : undefined)
 						a(href='/obecnosci/') Obecności
+						
+
+					li(class=page === 'uwagi' ? 'active' : undefined)
+						a(href='/uwagi/') Uwagi
 						
 					li
 						a(href='/logout/') Wyloguj #{name}
