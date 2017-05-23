@@ -1,0 +1,21 @@
+doctype html
+html(lang='en')
+	include templates/head.pug
+	+head('Odebrane')
+	body
+		include templates/header.pug
+		+nav('komunikator')
+		main
+			.container
+				.section
+					p
+						span Nadawca: #{wiadomosc.Nadawca}
+						br
+						span Odbiorcy: #{wiadomosc.ListaOdbiorcow}
+						br
+						span Temat: #{wiadomosc.Tytul}
+						br
+						span Tresc: #{wiadomosc.Text}
+					p
+						a(href="/komunikator/odebrane/") Powrót
+		include templates/footer.pug

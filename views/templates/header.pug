@@ -2,7 +2,14 @@ mixin nav(page)
 	header
 		nav.teal(role='navigation')
 			.nav-wrapper.container
+				ul#komunikator.dropdown-content
+					li
+						a(href="/komunikator/odebrane/") Odebrane
+						a(href="/komunikator/wyslane/") Wysłane
+						a(href="/komunikator/napisz/") Napisz
+
 				a#logo-container.brand-logo.white-text(href='#') iDziennik
+
 				ul.right.hide-on-med-and-down
 					li(class=page === 'pulpit' ? 'active' : undefined)
 						a.white-text(href='/pulpit/') Pulpit
@@ -28,8 +35,18 @@ mixin nav(page)
 					li(class=page === 'sprawdziany' ? 'active' : undefined)
 						a.white-text(href='/sprawdziany/') Sprawdziany
 
+					li(class=page === 'komunikator' ? 'active' : undefined)
+						a.white-text(href="#!", data-activates="komunikator", class="dropdown-button") Komunikator
+
 					li
 						a.white-text(href='/logout/') Wyloguj #{name}
+
+				ul#komunikator-m.dropdown-content
+					li
+						a(href="/komunikator/odebrane/") Odebrane
+						a(href="/komunikator/wyslane/") Wysłane
+						a(href="/komunikator/napisz/") Napisz
+
 				ul#nav-mobile.side-nav
 					li(class=page === 'pulpit' ? 'active' : undefined)
 						a(href='/pulpit/') Pulpit
@@ -54,6 +71,10 @@ mixin nav(page)
 
 					li(class=page === 'sprawdziany' ? 'active' : undefined)
 						a(href='/sprawdziany/') Sprawdziany
+						
+
+					li(class=page === 'komunikator' ? 'active' : undefined)
+						a(href="#!", data-activates="komunikator-m", class="dropdown-button") Komunikator
 						
 					li
 						a(href='/logout/') Wyloguj #{name}

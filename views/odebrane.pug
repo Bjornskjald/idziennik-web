@@ -1,0 +1,23 @@
+doctype html
+html(lang='en')
+	include templates/head.pug
+	+head('Odebrane')
+	body
+		include templates/header.pug
+		+nav('komunikator')
+		main
+			.container
+				.section
+					table.striped
+						tr
+							th Data nadania
+							th Nadawca
+							th Temat
+						each wiadomosc in lista
+							tr
+								td(style="white-space: nowrap")= wiadomosc.DataNadania
+								td(style="white-space: nowrap")= wiadomosc.Nadawca
+								td
+									a(href="/komunikator/wiadomosc/?id="+wiadomosc._recordId)= wiadomosc.Tytul
+					p= JSON.stringify(lista)
+		include templates/footer.pug
