@@ -1,0 +1,23 @@
+doctype html
+html(lang='en')
+	include templates/head.pug
+	+head('Sprawdziany')
+	body
+		include templates/header.pug
+		+nav('sprawdziany')
+		main
+			.container
+				.section
+					table.striped
+						tr
+							th Data
+							th Przedmiot
+							th Rodzaj
+							th Zakres
+						each sprawdzian in sprawdziany
+							tr
+								td= sprawdzian.data
+								td(style="white-space: nowrap")= sprawdzian.przedmiot
+								td= sprawdzian.rodzaj
+								td= sprawdzian.zakres
+		include templates/footer.pug

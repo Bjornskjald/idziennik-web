@@ -338,18 +338,9 @@ app.get('/zadania/', (req, res) => {
 		res.redirect('/login/')
 		return
 	}
-	var date = new Date()
-	var list = []
+	var date = typeof req.query.date === 'string' ? new Date(req.query.date) : new Date()
 	data[req.cookies.username].client.praceDomowe(date).then(zadania => {
-		zadania.ListK.forEach(zadanie => {
-			list.push({
-				dataZ: zadanie.dataZ,
-				dataO: zadanie.dataO,
-				przedmiot: zadanie.przed,
-				temat: `<a href="/zadanie/?id=${zadanie._recordId}">${zadanie.tytul}</a>`
-			})
-		})
-		res.render('zadania', {name: req.cookies.username, list: list})
+		res.render('zadania', {name: req.cookies.username, zadania: zadania.ListK})
 	}).catch(err => {
 		if(err.toString().toLowerCase().includes('authentication failed.')){
 			var index = data[req.cookies.username].tokens.indexOf(req.cookies.token)
@@ -398,8 +389,9 @@ app.get('/obecnosci/', (req, res) => {
 		res.redirect('/login/')
 		return
 	}
+	var date = typeof req.query.date === 'string' ? new Date(req.query.date) : new Date()
 	var miesiac = []
-	var offset = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getDay()
+	var offset = new Date(date.getFullYear(), date.getMonth(), 1).getDay()
 	if(offset === 0){
 		offset = 7
 	} else {
@@ -408,10 +400,8 @@ app.get('/obecnosci/', (req, res) => {
 	for(var i = 0; i < offset; i++){
 		miesiac.push([])
 	}
-	data[req.cookies.username].client.obecnosci(new Date()).then(obecnosci => {
+	data[req.cookies.username].client.obecnosci(date).then(obecnosci => {
 		obecnosci.Obecnosci.forEach(lekcja => {
-			delete lekcja.__type
-			delete lekcja.IdRegisterPosition
 			switch(lekcja.TypObecnosci){
 				case 'T':
 					var color = '#CCFFCC' // zielony
@@ -449,6 +439,16 @@ app.get('/obecnosci/', (req, res) => {
 			tygodnie.push(miesiac.slice(j, j+7))
 		}
 		res.render('obecnosci', {name: req.cookies.username, tygodnie: tygodnie})
+	}).catch(err => {
+		if(err.toString().toLowerCase().includes('authentication failed.')){
+			var index = data[req.cookies.username].tokens.indexOf(req.cookies.token)
+			delete data[req.cookies.username].tokens[index]
+			res.clearCookie('token')
+			res.clearCookie('username')
+			res.render('error', {error: 'Sesja wygasła. Zaloguj się ponownie'})
+			return
+		}
+		res.render('error', {error: err})
 	})
 })
 
@@ -477,6 +477,37 @@ app.get('/uwagi/', (req, res) => {
 			}
 		})
 		res.render('uwagi', {name: req.cookies.username, uwagi: uwagi.SUwaga, punkty: counter, filtr: filtr})
+	}).catch(err => {
+		if(err.toString().toLowerCase().includes('authentication failed.')){
+			var index = data[req.cookies.username].tokens.indexOf(req.cookies.token)
+			delete data[req.cookies.username].tokens[index]
+			res.clearCookie('token')
+			res.clearCookie('username')
+			res.render('error', {error: 'Sesja wygasła. Zaloguj się ponownie'})
+			return
+		}
+		res.render('error', {error: err})
+	})
+})
+
+app.get('/sprawdziany/', (req, res) => {
+	if(!loggedIn(req)){
+		res.redirect('/login/')
+		return
+	}
+	var date = typeof req.query.date === 'string' ? new Date(req.query.date) : new Date()
+	data[req.cookies.username].client.sprawdziany(date).then(sprawdziany => {
+		res.render('sprawdziany', {name: req.cookies.username, sprawdziany: sprawdziany.ListK})
+	}).catch(err => {
+		if(err.toString().toLowerCase().includes('authentication failed.')){
+			var index = data[req.cookies.username].tokens.indexOf(req.cookies.token)
+			delete data[req.cookies.username].tokens[index]
+			res.clearCookie('token')
+			res.clearCookie('username')
+			res.render('error', {error: 'Sesja wygasła. Zaloguj się ponownie'})
+			return
+		}
+		res.render('error', {error: err})
 	})
 })
 

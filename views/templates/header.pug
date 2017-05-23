@@ -24,6 +24,10 @@ mixin nav(page)
 					li(class=page === 'uwagi' ? 'active' : undefined)
 						a.white-text(href='/uwagi/') Uwagi
 
+
+					li(class=page === 'sprawdziany' ? 'active' : undefined)
+						a.white-text(href='/sprawdziany/') Sprawdziany
+
 					li
 						a.white-text(href='/logout/') Wyloguj #{name}
 				ul#nav-mobile.side-nav
@@ -46,6 +50,10 @@ mixin nav(page)
 
 					li(class=page === 'uwagi' ? 'active' : undefined)
 						a(href='/uwagi/') Uwagi
+						
+
+					li(class=page === 'sprawdziany' ? 'active' : undefined)
+						a(href='/sprawdziany/') Sprawdziany
 						
 					li
 						a(href='/logout/') Wyloguj #{name}
