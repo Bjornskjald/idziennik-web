@@ -14,10 +14,11 @@ html(lang='en')
 							th Data zadania
 							th Data oddania
 							th Temat
-						each zadanie in list
+						each zadanie in zadania
 							tr
-								td!= zadanie.przedmiot
+								td!= zadanie.przed
 								td!= zadanie.dataZ
 								td!= zadanie.dataO
-								td!= zadanie.temat
+								td
+									a(href="/zadanie/?id="+zadanie._recordId)= zadanie.tytul
 		include templates/footer.pug
