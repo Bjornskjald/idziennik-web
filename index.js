@@ -493,7 +493,7 @@ function markToInt(ocena){
 }
 
 function handleError(req, res, err){
-	if(err.toString().toLowerCase().includes('authentication failed.')){
+	if(err.toString().toLowerCase().includes('authentication failed.') || err.toString().toLowerCase().includes('unauthorized')){
 		var index = data[req.cookies.username].tokens.indexOf(req.cookies.token)
 		delete data[req.cookies.username].tokens[index]
 		res.clearCookie('token')
