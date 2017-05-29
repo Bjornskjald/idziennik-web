@@ -91,8 +91,7 @@ app.get('/pulpit/', (req, res) => {
 			d.lekcje.str = 'Brak lekcji'
 		} else {
 			d.lekcje.arr.push('')
-			d.lekcje.str = d.lekcje.arr.join('<br />')
-			d.lekcje.str = 'Lekcje: <br />' + d.lekcje.str
+			d.lekcje.str = 'Lekcje: <br />' + d.lekcje.arr.join('<br />')
 		}
 		if(d.dzien === 7){
 			// Trzeba powtórzyć żądanie żeby pobrać plan na następny dzień (poniedziałek)
@@ -102,13 +101,12 @@ app.get('/pulpit/', (req, res) => {
 				j.lekcje.str = 'Brak lekcji'
 			} else {
 				j.lekcje.arr.push('')
-				j.lekcje.str = j.lekcje.arr.join('<br />')
-				j.lekcje.str = 'Lekcje: <br />' + j.lekcje.str
+				j.lekcje.str = 'Lekcje: <br />' + j.lekcje.arr.join('<br />')
 			}
-			return
+			return false
 		}
 	}).then(plan => {
-		if(typeof j.lekcje.str !== 'string'){
+		if(plan){
 			plan.Przedmioty.forEach(lekcja => {
 				if(lekcja.DzienTygodnia === j.dzien){
 					if(lekcja.TypZastepstwa !== -1){
@@ -122,8 +120,7 @@ app.get('/pulpit/', (req, res) => {
 				j.lekcje.str = 'Brak lekcji'
 			} else {
 				j.lekcje.arr.push('')
-				j.lekcje.str = j.lekcje.arr.join('<br />')
-				j.lekcje.str = 'Lekcje: <br />' + j.lekcje.str
+				j.lekcje.str = 'Lekcje: <br />' + j.lekcje.arr.join('<br />')
 			}
 		}
 		return data[req.cookies.username].client.sprawdziany(new Date())
@@ -143,8 +140,7 @@ app.get('/pulpit/', (req, res) => {
 		if(d.sprawdziany.arr.length === 0){
 			d.sprawdziany.str = 'Brak sprawdzianów'
 		} else {
-			d.sprawdziany.str = d.sprawdziany.arr.join('<br />')
-			d.sprawdziany.str = 'Sprawdziany: <br />'+d.sprawdziany.str
+			d.sprawdziany.str = 'Sprawdziany: <br />' + d.sprawdziany.arr.join('<br />')
 		}
 		if(j.date.getDate() === 1){
 			return data[req.cookies.username].client.sprawdziany(j.date())
@@ -152,13 +148,12 @@ app.get('/pulpit/', (req, res) => {
 			if(j.sprawdziany.arr.length === 0){
 				j.sprawdziany.str = 'Brak sprawdzianów'
 			} else {
-				j.sprawdziany.str = j.sprawdziany.arr.join('<br />')
-				j.sprawdziany.str = 'Sprawdziany: <br />'+j.sprawdziany.str
+				j.sprawdziany.str = 'Sprawdziany: <br />' + j.sprawdziany.arr.join('<br />')
 			}
-			return
+			return false
 		}
 	}).then(sprawdziany => {
-		if(typeof d.sprawdziany.str !== 'string'){
+		if(sprawdziany){
 			sprawdziany.ListK.forEach(sprawdzian => {
 				if(sprawdzian.data === d.date.toJSON().split('T')[0]){
 					d.sprawdziany.arr.push(`${sprawdzian.rodzaj} - ${sprawdzian.rodzaj}: ${sprawdzian.zakres}`)
@@ -170,8 +165,7 @@ app.get('/pulpit/', (req, res) => {
 			if(j.sprawdziany.arr.length === 0){
 				j.sprawdziany.str = 'Brak sprawdzianów'
 			} else {
-				j.sprawdziany.str = j.sprawdziany.arr.join('<br />')
-				j.sprawdziany.str = 'Sprawdziany: <br />'+j.sprawdziany.str
+				j.sprawdziany.str = 'Sprawdziany: <br />' + j.sprawdziany.arr.join('<br />')
 			}
 		}
 		return data[req.cookies.username].client.praceDomowe(new Date())
@@ -183,19 +177,17 @@ app.get('/pulpit/', (req, res) => {
 			if(zadanie.dataO === j.date.toJSON().split('T')[0]){
 				j.zadania.arr.push(`${zadanie.przed}: ${zadanie.tytul}`)
 			}
-			if(d.zadania.arr.length === 0){
-				d.zadania.str = 'Brak zadań domowych'
-			} else {
-				d.zadania.str = d.zadania.arr.join('<br />')
-				d.zadania.str = 'Zadania: <br />'+d.zadania.str
-			}
-			if(j.zadania.arr.length === 0){
-				j.zadania.str = 'Brak zadań domowych'
-			} else {
-				j.zadania.str = j.zadania.arr.join('<br />')
-				j.zadania.str = 'Zadania: <br />'+j.zadania.str
-			}
 		})
+		if(d.zadania.arr.length === 0){
+			d.zadania.str = 'Brak zadań domowych'
+		} else {
+			d.zadania.str = 'Zadania: <br />' + d.zadania.arr.join('<br />')
+		}
+		if(j.zadania.arr.length === 0){
+			j.zadania.str = 'Brak zadań domowych'
+		} else {
+			j.zadania.str = 'Zadania: <br />' + j.zadania.arr.join('<br />')
+		}
 		return data[req.cookies.username].client.wydarzenia()
 	}).then(wydarzenia => {
 		wydarzenia.ListK.forEach(wydarzenie => {
@@ -205,19 +197,17 @@ app.get('/pulpit/', (req, res) => {
 			if(wydarzenie.data === j.date.toJSON().split('T')[0]){
 				j.wydarzenia.arr.push(wydarzenie.info)
 			}
-			if(d.wydarzenia.arr.length === 0){
-				d.wydarzenia.str = 'Brak wydarzeń'
-			} else {
-				d.wydarzenia.str = d.wydarzenia.arr.join('<br />')
-				d.wydarzenia.str = 'Wydarzenia: <br />'+d.wydarzenia.str
-			}
-			if(j.wydarzenia.arr.length === 0){
-				j.wydarzenia.str = 'Brak wydarzeń'
-			} else {
-				j.wydarzenia.str = j.wydarzenia.arr.join('<br />')
-				j.wydarzenia.str = 'Wydarzenia: <br />'+j.wydarzenia.str
-			}
 		})
+		if(d.wydarzenia.arr.length === 0){
+			d.wydarzenia.str = 'Brak wydarzeń'
+		} else {
+			d.wydarzenia.str = 'Wydarzenia: <br />' + d.wydarzenia.arr.join('<br />')
+		}
+		if(j.wydarzenia.arr.length === 0){
+			j.wydarzenia.str = 'Brak wydarzeń'
+		} else {
+			j.wydarzenia.str = 'Wydarzenia: <br />' + j.wydarzenia.arr.join('<br />')
+		}
 		res.render('pulpit', {name: req.cookies.username, d: d, j: j})
 	}).catch(err => handleError(req, res, err))
 })
