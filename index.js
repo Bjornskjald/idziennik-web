@@ -143,7 +143,7 @@ app.get('/pulpit/', (req, res) => {
 			d.sprawdziany.str = 'Sprawdziany: <br />' + d.sprawdziany.arr.join('<br />')
 		}
 		if(j.date.getDate() === 1){
-			return data[req.cookies.username].client.sprawdziany(j.date())
+			return data[req.cookies.username].client.sprawdziany(j.date)
 		} else {
 			if(j.sprawdziany.arr.length === 0){
 				j.sprawdziany.str = 'Brak sprawdzianów'
