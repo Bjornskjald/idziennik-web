@@ -179,11 +179,11 @@ app.get('/pulpit/', (req, res) => {
         j.wydarzenia += wydarzenie.info
       }
     })
-    if (d.wydarzenia.arr.length === 18) {
-      d.wydarzenia.str = 'Brak wydarzeń'
+    if (d.wydarzenia.length === 18) {
+      d.wydarzenia = 'Brak wydarzeń'
     }
-    if (j.wydarzenia.arr.length === 18) {
-      j.wydarzenia.str = 'Brak wydarzeń'
+    if (j.wydarzenia.length === 18) {
+      j.wydarzenia = 'Brak wydarzeń'
     }
     res.render('pulpit', {name: req.cookies.username, d: d, j: j})
   }).catch(err => handleError(req, res, err))
@@ -194,38 +194,7 @@ app.get('/oceny/', (req, res) => {
     res.redirect('/login/')
     return
   }
-  data[req.cookies.username].client.oceny().then(result => {
-    var srednia = 0
-    var sredniaCounter = 0
-    var list = {}
-    result.Przedmioty.forEach(przedmiot => {
-      var tmp = []
-      przedmiot.Oceny.forEach(ocena => {
-        var desc = `Kategoria: ${ocena.Kategoria}<br />Waga: ${ocena.Waga}<br />Data: ${ocena.Data_wystaw}`
-        if (ocena.Typ === 0) {
-          if (typeof req.query.filtr === 'string' && req.query.filtr === '1') {
-            if (Math.abs(new Date() - new Date(ocena.Data_wystaw.replace(/-/g, '/'))) < 2678400000) {
-              tmp.push(`<a href="#!" class="ocena" style="color:#${ocena.Kolor}" onclick="Materialize.toast('${desc}', 5000)">${ocena.Ocena}</a>`)
-            }
-          } else if (typeof req.query.szukaj === 'string') {
-            if (ocena.Kategoria.toLowerCase().includes(req.query.szukaj.toLowerCase()) || ocena.Ocena.toLowerCase().includes(req.query.szukaj.toLowerCase())) {
-              tmp.push(`<a href="#!" class="ocena" style="color:#${ocena.Kolor}" onclick="Materialize.toast('${desc}', 5000)">${ocena.Ocena}</a>`)
-            }
-          } else {
-            tmp.push(`<a href="#!" class="ocena" style="color:#${ocena.Kolor}" onclick="Materialize.toast('${desc}', 5000)">${ocena.Ocena}</a>`)
-          }
-        }
-      })
-      list[przedmiot.Przedmiot] = {
-        oceny: tmp.join(' '),
-        srednia: przedmiot.SrednieCaloroczne,
-        srednianum: markToInt(parseInt(przedmiot.SrednieCaloroczne, 10))}
-      srednia += markToInt(parseInt(przedmiot.SrednieCaloroczne, 10))
-      sredniaCounter++
-    })
-    srednia = Math.round(srednia / sredniaCounter * 100) / 100
-    res.render('oceny', {result: list, name: req.cookies.username, srednia: srednia})
-  }).catch(err => handleError(req, res, err))
+  res.render('oceny', {name: req.cookies.username})
 })
 
 app.get('/plan/', (req, res) => {
@@ -233,43 +202,9 @@ app.get('/plan/', (req, res) => {
     res.redirect('/login/')
     return
   }
-  var lekcje = [[], [], [], [], []]
-  var date = typeof req.query.date === 'string' ? new Date(req.query.date) : new Date()
-  data[req.cookies.username].client.plan(date).then(plan => {
-    var descBase = '<span style="color: #ff3300">'
-    plan.Przedmioty.forEach(lekcja => {
-      var tmp = []
-      tmp.push(lekcja.Nazwa.length < 15 ? lekcja.Nazwa : lekcja.Skrot)
-      switch (lekcja.TypZastepstwa) {
-        case 0:
-          tmp.push(descBase + 'Odwołane</span>')
-          break
-        case 1:
-          tmp.push(descBase + 'Zastępstwo')
-          tmp.push(`(${lekcja.NauZastepujacy})</span>`)
-          break
-        case 2:
-          tmp.push(descBase + 'Zastępstwo')
-          tmp.push(`(${lekcja.NauZastepujacy} - ${lekcja.PrzedmiotZastepujacy})</span>`)
-          break
-        case 3:
-          tmp.push(descBase + 'Zastępstwo - inne')
-          tmp.push(`(${lekcja.NauZastepujacy})</span>`)
-          break
-        case 4:
-          tmp.push(descBase + 'Łączona')
-          tmp.push(`(${lekcja.NauZastepujacy})</span>`)
-          break
-        case 5:
-          tmp.push(descBase + 'Łączona - inna')
-          tmp.push(`(${lekcja.NauZastepujacy} - ${lekcja.PrzedmiotZastepujacy})</span>`)
-          break
-      }
-      lekcje[lekcja.DzienTygodnia - 1][lekcja.Godzina] = tmp.join('<br />')
-    })
-    res.render('plan', {name: req.cookies.username, lekcje: lekcje, godziny: plan.GodzinyLekcyjne})
-  }).catch(err => handleError(req, res, err))
+  res.render('plan', {name: req.cookies.username})
 })
+
 
 app.get('/zadania/', (req, res) => {
   if (!loggedIn(req)) {
@@ -456,8 +391,28 @@ app.get('/logout/', (req, res) => {
   res.redirect('/')
 })
 
-app.get('*', (req, res) => {
-  res.status(404).sendFile(path.join(__dirname, 'res', '404.html'))
+app.get('/api/oceny/', (req, res) => {
+  if (!loggedIn(req)) {
+    res.redirect('/login/')
+    return
+  }
+  data[req.cookies.username].client
+  .oceny()
+  .then(res.json)
+  .catch(console.error)
+})
+
+app.get('/api/plan/', (req, res) => {
+  if (!loggedIn(req)) {
+  res.redirect('/login/')
+  return
+  }
+  data[req.cookies.username].client
+  .plan(typeof req.query.date === 'string' ? new Date(req.query.date) : new Date())
+  .then(plan => {
+    res.json(plan)
+  })
+  .catch(console.error)
 })
 
 function loggedIn (req) {
@@ -484,3 +439,11 @@ function handleError (req, res, err) {
   }
   res.render('error', {error: err})
 }
+
+app.get('/js/:filename', (req, res) => { // TODO: fix
+  res.sendFile(path.join(__dirname, 'res', 'js', req.params.filename))
+})
+
+app.get('*', (req, res) => {
+  res.status(404).sendFile(path.join(__dirname, 'res', '404.html'))
+})

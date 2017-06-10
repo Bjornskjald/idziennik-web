@@ -8,7 +8,8 @@ html(lang='en')
 		main
 			.container
 				.section
-					table.striped
+					input(id="date", type="date", class="datepicker", placeholder="Data")
+					table.striped#table
 						tr
 							th Godziny
 							th Poniedziałek
@@ -16,13 +17,5 @@ html(lang='en')
 							th Środa
 							th Czwartek
 							th Piątek
-						- for(var val = 0; val < lekcje[2].length; val++){
-							tr
-								td!= godziny[val].Poczatek + ' - ' + godziny[val].Koniec
-								td!= lekcje[0][val]
-								td!= lekcje[1][val]
-								td!= lekcje[2][val]
-								td!= lekcje[3][val]
-								td!= lekcje[4][val]
-						- }
 		include templates/footer.pug
+		script(src="/js/plan.js")

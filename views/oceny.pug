@@ -8,19 +8,15 @@ html(lang="pl")
 		main
 			.container
 				.section
-					h5 Twoja średnia: #{srednia}
-					a(class="btn waves-effect waves-light", href="/oceny/?filtr=1") Ostatni miesiąc 
-					a(class="btn waves-effect waves-light", href="/oceny/") Wszystkie
-					form(method="get", action="/oceny/")
-						.input-field.inline
-							input(name="szukaj")#searchbox
-						button(class="btn waves-effect waves-light", type="submit") Szukaj
+					h5#srednia Twoja średnia: 
+					a(class="btn waves-effect waves-light", href="javascript:filter('ostatniMiesiac')") Ostatni miesiąc 
+					a(class="btn waves-effect waves-light", href="javascript:wszystkie()") Wszystkie
+					.input-field.inline
+						input#szukaj
+						label(for="szukaj") Szukaj
+					a(class="btn waves-effect waves-light", href="javascript:filter('szukaj')") Szukaj
 					br
-					table.striped(style="margin-top: 10px")
-						each val, index in result
-							tr 
-								td= index
-								td.oceny!= val.oceny
-								td.przedmiot!= val.srednia
-								td.przedmiot!= val.srednianum
+					br
+					table.striped#table
 		include templates/footer.pug
+		script(src="/js/oceny.js")
