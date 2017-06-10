@@ -68,8 +68,11 @@ app.get('/pulpit/', (req, res) => {
 	}
 	var d = {lekcje: {arr: []}, sprawdziany: {arr: []}, zadania: {arr: []}, wydarzenia: {arr: []}}
 	var j = {lekcje: {arr: []}, sprawdziany: {arr: []}, zadania: {arr: []}, wydarzenia: {arr: []}}
-	data[req.cookies.username].client.plan(new Date()).then(plan => {
-		d.dzien = new Date().getDay() === 0 ? 7 : new Date().getDay()
+	d.date = new Date()
+	j.date = new Date()
+	j.date.setDate(d.date.getDate() + 1)
+	data[req.cookies.username].client.plan(d.date).then(plan => {
+		d.dzien = d.date.getDay() === 0 ? 7 : d.date.getDay()
 		j.dzien = d.dzien === 7 ? 0 : d.dzien + 1
 		plan.Przedmioty.forEach(lekcja => {
 			if(lekcja.DzienTygodnia === d.dzien){
@@ -95,7 +98,7 @@ app.get('/pulpit/', (req, res) => {
 		}
 		if(d.dzien === 7){
 			// Trzeba powtórzyć żądanie żeby pobrać plan na następny dzień (poniedziałek)
-			return data[req.cookies.username].client.plan(new Date(new Date().getTime()+86400000))
+			return data[req.cookies.username].client.plan(j.date)
 		} else {
 			if(j.lekcje.arr.length === 0){
 				j.lekcje.str = 'Brak lekcji'
@@ -123,17 +126,17 @@ app.get('/pulpit/', (req, res) => {
 				j.lekcje.str = 'Lekcje: <br />' + j.lekcje.arr.join('<br />')
 			}
 		}
-		return data[req.cookies.username].client.sprawdziany(new Date())
+		return data[req.cookies.username].client.sprawdziany(d.date)
 	}).then(sprawdziany => {
-		d.date = new Date()
-		d.date.setHours(d.date.getHours() - d.date.getTimezoneOffset() / 60)
-		j.date = new Date(new Date().getTime()+86400000)
-		j.date.setHours(j.date.getHours() - j.date.getTimezoneOffset() / 60)
+		d.jsondate = new Date(d.date)
+		j.jsondate = new Date(j.date)
+		d.jsondate.setHours(d.date.getHours() - d.date.getTimezoneOffset() / 60)
+		j.jsondate.setHours(j.date.getHours() - j.date.getTimezoneOffset() / 60)
 		sprawdziany.ListK.forEach(sprawdzian => {
-			if(sprawdzian.data === d.date.toJSON().split('T')[0]){
+			if(sprawdzian.data === d.jsondate.toJSON().split('T')[0]){
 				d.sprawdziany.arr.push(`${sprawdzian.rodzaj} - ${sprawdzian.rodzaj}: ${sprawdzian.zakres}`)
 			}
-			if(sprawdzian.data === j.date.toJSON().split('T')[0]){
+			if(sprawdzian.data === j.jsondate.toJSON().split('T')[0]){
 				j.sprawdziany.arr.push(`${sprawdzian.rodzaj} - ${sprawdzian.rodzaj}: ${sprawdzian.zakres}`)
 			}
 		})
@@ -142,7 +145,7 @@ app.get('/pulpit/', (req, res) => {
 		} else {
 			d.sprawdziany.str = 'Sprawdziany: <br />' + d.sprawdziany.arr.join('<br />')
 		}
-		if(j.date.getDate() === 1){
+		if(d.date.getDate() === 7){
 			return data[req.cookies.username].client.sprawdziany(j.date)
 		} else {
 			if(j.sprawdziany.arr.length === 0){
@@ -168,13 +171,13 @@ app.get('/pulpit/', (req, res) => {
 				j.sprawdziany.str = 'Sprawdziany: <br />' + j.sprawdziany.arr.join('<br />')
 			}
 		}
-		return data[req.cookies.username].client.praceDomowe(new Date())
+		return data[req.cookies.username].client.praceDomowe(d.date)
 	}).then(zadania => {
 		zadania.ListK.forEach(zadanie => {
-			if(zadanie.dataO === d.date.toJSON().split('T')[0]){
+			if(zadanie.dataO === d.jsondate.toJSON().split('T')[0]){
 				d.zadania.arr.push(`${zadanie.przed}: ${zadanie.tytul}`)
 			}
-			if(zadanie.dataO === j.date.toJSON().split('T')[0]){
+			if(zadanie.dataO === j.jsondate.toJSON().split('T')[0]){
 				j.zadania.arr.push(`${zadanie.przed}: ${zadanie.tytul}`)
 			}
 		})
@@ -191,10 +194,10 @@ app.get('/pulpit/', (req, res) => {
 		return data[req.cookies.username].client.wydarzenia()
 	}).then(wydarzenia => {
 		wydarzenia.ListK.forEach(wydarzenie => {
-			if(wydarzenie.data === d.date.toJSON().split('T')[0]){
+			if(wydarzenie.data === d.jsondate.toJSON().split('T')[0]){
 				d.wydarzenia.arr.push(wydarzenie.info)
 			}
-			if(wydarzenie.data === j.date.toJSON().split('T')[0]){
+			if(wydarzenie.data === j.jsondate.toJSON().split('T')[0]){
 				j.wydarzenia.arr.push(wydarzenie.info)
 			}
 		})
