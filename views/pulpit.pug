@@ -8,20 +8,19 @@ html(lang="pl")
 		main
 			.container
 				.section
-					h5 Witaj, #{name}
 					.row
 						.col.s12.m6
 							.card.teal.darken-1
 								.card-content.white-text
 									span.card-title Dzisiaj
 									p
-										span!= d.lekcje.str
+										span#dzisiaj-lekcje
 										br
-										span!= d.sprawdziany.str
+										span#dzisiaj-sprawdziany
 										br
-										span!= d.zadania.str
+										span#dzisiaj-zadania
 										br
-										span!= d.wydarzenia.str
+										span#dzisiaj-wydarzenia
 								.card-action(style="display: flex; flex-wrap: wrap")
 									a(href="/plan/") Plan
 									a(href="/sprawdziany/") Sprawdziany
@@ -32,16 +31,17 @@ html(lang="pl")
 								.card-content.white-text
 									span.card-title Jutro
 									p
-										span!= j.lekcje.str
+										span#jutro-lekcje
 										br
-										span!= j.sprawdziany.str
+										span#jutro-sprawdziany
 										br
-										span!= j.zadania.str
+										span#jutro-zadania
 										br
-										span!= j.wydarzenia.str
+										span#jutro-wydarzenia
 								.card-action(style="display: flex; flex-wrap: wrap")
 									a(href="/plan/") Plan
 									a(href="/sprawdziany/") Sprawdziany
 									a(href="/zadania/") Zadania
 									a(href="/wydarzenia/") Wydarzenia
 		include templates/footer.pug
+		script(src="/js/pulpit.js")

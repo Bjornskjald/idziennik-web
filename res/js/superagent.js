@@ -1953,3 +1953,5 @@ request.put = function(url, data, fn){
 };
 
 },{"./is-function":2,"./is-object":3,"./request-base":4,"./response-base":5,"./should-retry":6,"component-emitter":1}]},{},[]);
+
+const request = require('superagent')

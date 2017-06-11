@@ -1,5 +1,3 @@
-var request = require('superagent')
-
 var $input = $('#date').pickadate({
 	selectMonths: true,
 	selectYears: 15,

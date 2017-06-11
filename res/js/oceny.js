@@ -1,5 +1,3 @@
-var request = require('superagent')
-
 request.get('/api/oceny').then(oceny => {
 	oceny = oceny.body
 	console.log('oceny', oceny)

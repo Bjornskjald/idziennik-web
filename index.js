@@ -66,127 +66,7 @@ app.get('/pulpit/', (req, res) => {
     res.redirect('/login/')
     return
   }
-  var d = {lekcje: 'Lekcje: <br />', sprawdziany: 'Sprawdziany: <br />', zadania: 'Zadania: <br />', wydarzenia: 'Wydarzenia: <br />'}
-  var j = {lekcje: 'Lekcje: <br />', sprawdziany: 'Sprawdziany: <br />', zadania: 'Zadania: <br />', wydarzenia: 'Wydarzenia: <br />'}
-  d.date = new Date()
-  j.date = new Date()
-  j.date.setDate(d.date.getDate() + 1)
-  data[req.cookies.username].client.plan(d.date).then(plan => {
-    d.dzien = d.date.getDay() === 0 ? 7 : d.date.getDay()
-    j.dzien = d.dzien === 7 ? 0 : d.dzien + 1
-    plan.Przedmioty.forEach(lekcja => {
-      if (lekcja.DzienTygodnia === d.dzien) {
-        if (lekcja.TypZastepstwa === -1) {
-          d.lekcje += `${lekcja.Godzina}. ${lekcja.Nazwa}<br />`
-        } else {
-          d.lekcje += `<span style="text-decoration: line-through">${lekcja.Godzina}. ${lekcja.Nazwa}</span> <br />`
-        }
-      }
-      if (d.dzien !== 7 && lekcja.DzienTygodnia === j.dzien) {
-        if (lekcja.TypZastepstwa === -1) {
-          j.lekcje += `${lekcja.Godzina}. ${lekcja.Nazwa}<br />`
-        } else {
-          j.lekcje += `<span style="text-decoration: line-through">${lekcja.Godzina}. ${lekcja.Nazwa}</span> <br />`
-        }
-      }
-    })
-    if (d.lekcje.length === 14) {
-      d.lekcje = 'Brak lekcji'
-    }
-    if (d.dzien !== 7) {
-      if (j.lekcje.length === 14) {
-        j.lekcje = 'Brak lekcji'
-      }
-      return false
-    } else {
-      // Trzeba powtórzyć żądanie żeby pobrać plan na następny dzień (poniedziałek)
-      return data[req.cookies.username].client.plan(j.date)
-    }
-  }).then(plan => {
-    if (plan) {
-      plan.Przedmioty.forEach(lekcja => {
-        if (lekcja.DzienTygodnia === j.dzien) {
-          if (lekcja.TypZastepstwa === -1) {
-            j.lekcje += `${lekcja.Godzina}. ${lekcja.Nazwa} <br />`
-          } else {
-            j.lekcje += `<span style="text-decoration: line-through">${lekcja.Godzina}. ${lekcja.Nazwa}</span> <br />`
-          }
-        }
-      })
-      if (j.lekcje.length === 14) {
-        j.lekcje = 'Brak lekcji'
-      }
-    }
-    return data[req.cookies.username].client.sprawdziany(d.date)
-  }).then(sprawdziany => {
-    d.jsondate = new Date(d.date)
-    j.jsondate = new Date(j.date)
-    d.jsondate.setHours(d.date.getHours() - d.date.getTimezoneOffset() / 60)
-    j.jsondate.setHours(j.date.getHours() - j.date.getTimezoneOffset() / 60)
-    sprawdziany.ListK.forEach(sprawdzian => {
-      if (sprawdzian.data === d.jsondate.toJSON().split('T')[0]) {
-        d.sprawdziany += `${sprawdzian.rodzaj} - ${sprawdzian.rodzaj}: ${sprawdzian.zakres} <br />`
-      }
-      if (sprawdzian.data === j.jsondate.toJSON().split('T')[0]) {
-        j.sprawdziany += `${sprawdzian.rodzaj} - ${sprawdzian.rodzaj}: ${sprawdzian.zakres} <br />`
-      }
-    })
-    if (d.sprawdziany.length === 19) {
-      d.sprawdziany = 'Brak sprawdzianów'
-    }
-    if (d.dzien !== 7) {
-      if (j.sprawdziany.length === 19) {
-        j.sprawdziany = 'Brak sprawdzianów'
-      }
-      return false
-    } else {
-      return data[req.cookies.username].client.sprawdziany(j.date)
-    }
-  }).then(sprawdziany => {
-    if (sprawdziany) {
-      sprawdziany.ListK.forEach(sprawdzian => {
-        if (sprawdzian.data === j.jsondate.toJSON().split('T')[0]) {
-          j.sprawdziany += `${sprawdzian.rodzaj} - ${sprawdzian.rodzaj}: ${sprawdzian.zakres} <br />`
-        }
-      })
-      if (j.sprawdziany.length === 19) {
-        j.sprawdziany = 'Brak sprawdzianów'
-      }
-    }
-    return data[req.cookies.username].client.praceDomowe(d.date)
-  }).then(zadania => {
-    zadania.ListK.forEach(zadanie => {
-      if (zadanie.dataO === d.jsondate.toJSON().split('T')[0]) {
-        d.zadania += `${zadanie.przed}: ${zadanie.tytul} <br />`
-      }
-      if (zadanie.dataO === j.jsondate.toJSON().split('T')[0]) {
-        j.zadania += `${zadanie.przed}: ${zadanie.tytul} <br />`
-      }
-    })
-    if (d.zadania.length === 15) {
-      d.zadania = 'Brak zadań domowych'
-    }
-    if (j.zadania.length === 15) {
-      j.zadania = 'Brak zadań domowych'
-    }
-    return data[req.cookies.username].client.wydarzenia()
-  }).then(wydarzenia => {
-    wydarzenia.ListK.forEach(wydarzenie => {
-      if (wydarzenie.data === d.jsondate.toJSON().split('T')[0]) {
-        d.wydarzenia += wydarzenie.info
-      }
-      if (wydarzenie.data === j.jsondate.toJSON().split('T')[0]) {
-        j.wydarzenia += wydarzenie.info
-      }
-    })
-    if (d.wydarzenia.length === 18) {
-      d.wydarzenia = 'Brak wydarzeń'
-    }
-    if (j.wydarzenia.length === 18) {
-      j.wydarzenia = 'Brak wydarzeń'
-    }
-    res.render('pulpit', {name: req.cookies.username, d: d, j: j})
-  }).catch(err => handleError(req, res, err))
+  res.render('pulpit', {name: req.cookies.username})
 })
 
 app.get('/oceny/', (req, res) => {
@@ -435,10 +315,24 @@ app.get('/api/zadanie/:id/', (req, res) => {
     return
   }
   if (!req.params.id){
-    throw new Error('Brak ID zadania.')
+    handleAPIError(req, res, 'Invalid homework ID')
+    return
   }
   data[req.cookies.username].client
     .pracaDomowa(req.params.id)
+    .then(r => {
+      res.json(r)
+    })
+    .catch(err => { handleAPIError(req, res, err) })
+})
+
+app.get('/api/sprawdziany/', (req, res) => {
+  if (!loggedIn(req)) {
+    res.redirect('/login/')
+    return
+  }
+  data[req.cookies.username].client
+    .sprawdziany(typeof req.query.date === 'string' ? new Date(req.query.date) : new Date())
     .then(r => {
       res.json(r)
     })

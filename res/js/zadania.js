@@ -1,5 +1,3 @@
-const request = require('superagent')
-
 var temp = '<tr><th>Przedmiot</th><th>Data zadania</th><th>Data oddania</th><th>Tytuł</th></tr>'
 
 request.get('/api/zadania/').then(zadania => {
@@ -29,7 +27,7 @@ request.get('/api/zadania/').then(zadania => {
 	}
 	window.zadaniaRendered = temp
 	document.querySelector('#table').innerHTML = temp
-}).catch(err => handleError(err, 'zadania'))
+}).catch(alert)
 
 function zadania_wszystkie(){
 	var temp = '<tr><th>Przedmiot</th><th>Data zadania</th><th>Data oddania</th><th>Tytuł</th></tr>'
@@ -71,5 +69,5 @@ function zadanie(recordID){
 		`
 		$('#zadanie-modal').modal()
 		$('#zadanie-modal').modal('open')
-	}).catch(err => handleError(err, 'zadania'))
+	}).catch(alert)
 }
