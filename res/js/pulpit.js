@@ -76,7 +76,7 @@ request.get('/api/plan/').then(plan => {
 	document.querySelector('#jutro-zadania').innerHTML = j.zadania.length === 15 ? 'Brak zadań domowych' : j.zadania
 	return request.get('/api/wydarzenia/')
 }).then(wydarzenia => {
-	wydarzenia.ListK.forEach(wydarzenie => {
+	wydarzenia.body.ListK.forEach(wydarzenie => {
 		d.wydarzenia += wydarzenie.data === d.jsondate ? wydarzenie.info : ''
 		j.wydarzenia += wydarzenie.data === j.jsondate ? wydarzenie.info : ''
 	})
