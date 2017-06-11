@@ -74,21 +74,12 @@ request.get('/api/plan/').then(plan => {
 
 	document.querySelector('#dzisiaj-zadania').innerHTML = d.zadania.length === 15 ? 'Brak zadań domowych' : d.zadania
 	document.querySelector('#jutro-zadania').innerHTML = j.zadania.length === 15 ? 'Brak zadań domowych' : j.zadania
-	//return data[req.cookies.username].client.wydarzenia()
-/*}).then(wydarzenia => {
+	return request.get('/api/wydarzenia/')
+}).then(wydarzenia => {
 	wydarzenia.ListK.forEach(wydarzenie => {
-		if (wydarzenie.data === d.jsondate.toJSON().split('T')[0]) {
-			d.wydarzenia += wydarzenie.info
-		}
-		if (wydarzenie.data === j.jsondate.toJSON().split('T')[0]) {
-			j.wydarzenia += wydarzenie.info
-		}
+		d.wydarzenia += wydarzenie.data === d.jsondate ? wydarzenie.info : ''
+		j.wydarzenia += wydarzenie.data === j.jsondate ? wydarzenie.info : ''
 	})
-	if (d.wydarzenia.length === 18) {
-		d.wydarzenia = 'Brak wydarzeń'
-	}
-	if (j.wydarzenia.length === 18) {
-		j.wydarzenia = 'Brak wydarzeń'
-	}
-	*/
+	document.querySelector('#dzisiaj-wydarzenia').innerHTML = d.wydarzenia.length === 18 ? 'Brak wydarzeń' : d.wydarzenia
+	document.querySelector('#jutro-wydarzenia').innerHTML = j.wydarzenia.length === 18 ? 'Brak wydarzeń' : j.wydarzenia
 }).catch(console.error)
