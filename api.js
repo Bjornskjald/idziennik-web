@@ -18,7 +18,7 @@ module.exports = function(data, app) {
       return
     }
     data[req.cookies.username].client
-      .plan(typeof req.query.date === 'string' ? new Date(req.query.date) : new Date())
+      .plan(typeof req.query.date === 'string' ? new Date(parseInt(req.query.date)) : new Date())
       .then(r => {
         res.json(r)
       })
@@ -61,7 +61,7 @@ module.exports = function(data, app) {
       return
     }
     data[req.cookies.username].client
-      .sprawdziany(typeof req.query.date === 'string' ? new Date(req.query.date) : new Date())
+      .sprawdziany(typeof req.query.date === 'string' ? new Date(parseInt(req.query.date)) : new Date())
       .then(r => {
         res.json(r)
       })
@@ -87,7 +87,7 @@ module.exports = function(data, app) {
       return
     }
     data[req.cookies.username].client
-      .obecnosci(typeof req.query.date === 'string' ? new Date(req.query.date) : new Date())
+      .obecnosci(typeof req.query.date === 'string' ? new Date(parseInt(req.query.date), 10) : new Date())
       .then(r => {
         res.json(r)
       })
