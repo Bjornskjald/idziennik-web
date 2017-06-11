@@ -8,16 +8,6 @@ html(lang='en')
 		main
 			.container
 				.section
-					table.striped
-						each tydzien in tygodnie
-							tr
-								each dzien in tydzien
-									td(style="vertical-align: top")
-										if typeof dzien !== 'null' && typeof dzien !== 'undefined'
-											each lekcja in dzien
-												if typeof lekcja !== 'null' && typeof lekcja !== 'undefined'
-													span(style="background-color: "+lekcja.color)= lekcja.opis
-												br
-
-					p!= JSON.stringify(obecnosci)
+					table.striped#table
 		include templates/footer.pug
+		script(src="/js/obecnosci.js")
