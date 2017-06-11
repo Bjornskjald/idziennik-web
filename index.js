@@ -5,7 +5,6 @@ const path = require('path')
 const idziennik = require('idziennik')
 const Chance = require('chance')
 const chance = new Chance()
-
 var data = {}
 
 app.use(cookieParser())
@@ -14,6 +13,8 @@ app.set('view engine', 'pug')
 app.listen(8080, () => {
   console.log('App is listening on port 8080.')
 })
+
+require('./api.js')(data, app)
 
 app.get('/', (req, res) => {
   if (loggedIn(req)) {
@@ -121,61 +122,7 @@ app.get('/obecnosci/', (req, res) => {
     res.redirect('/login/')
     return
   }
-  var date = typeof req.query.date === 'string' ? new Date(req.query.date) : new Date()
-  var miesiac = []
-  var offset = new Date(date.getFullYear(), date.getMonth(), 1).getDay()
-  if (offset === 0) {
-    offset = 7
-  } else {
-    offset--
-  }
-  for (let i = 0; i < offset; i++) {
-    miesiac.push([])
-  }
-  data[req.cookies.username].client.obecnosci(date).then(obecnosci => {
-    obecnosci.Obecnosci.forEach(lekcja => {
-      var color
-      switch (lekcja.TypObecnosci) {
-        case 'T':
-          color = '#CCFFCC' // zielony
-          break
-        case 'N':
-          color = '#FFAD99' // czerwony
-          break
-        case 'F':
-        case 'B':
-          color = '#E3E3E3' // szary
-          break
-        case 'S':
-          color = '#FFFFAA' // żółty
-          break
-        case 'U':
-          color = '#FFE099' // pomarańczowy
-          break
-        case 'Z':
-          color = '#A8BEFF' // niebieski
-          break
-        case 'ZO':
-          color = '#FF69B4' // fioletowy
-          break
-        default:
-          color = '#E3E3E3'
-          break
-      }
-      if (typeof miesiac[lekcja.Dzien - 1 + offset] !== 'object') {
-        miesiac[lekcja.Dzien - 1 + offset] = []
-      }
-      miesiac[lekcja.Dzien - 1 + offset][lekcja.Godzina - 1] = {
-        opis: `${lekcja.Godzina}. ${lekcja.Przedmiot}`,
-        color: color
-      }
-    })
-    var tygodnie = []
-    for (let i = 0; i < miesiac.length; i += 7) {
-      tygodnie.push(miesiac.slice(i, i + 7))
-    }
-    res.render('obecnosci', {name: req.cookies.username, tygodnie: tygodnie})
-  }).catch(err => handleError(req, res, err))
+  res.render('obecnosci', {name: req.cookies.username})
 })
 
 app.get('/uwagi/', (req, res) => {
@@ -270,88 +217,6 @@ app.get('/logout/', (req, res) => {
   res.redirect('/')
 })
 
-app.get('/api/oceny/', (req, res) => {
-  if (!loggedIn(req)) {
-    res.redirect('/login/')
-    return
-  }
-  data[req.cookies.username].client
-    .oceny()
-    .then(r => {
-      res.json(r)
-    })
-    .catch(err => { handleAPIError(req, res, err) })
-})
-
-app.get('/api/plan/', (req, res) => {
-  if (!loggedIn(req)) {
-    res.redirect('/login/')
-    return
-  }
-  data[req.cookies.username].client
-    .plan(typeof req.query.date === 'string' ? new Date(req.query.date) : new Date())
-    .then(r => {
-      res.json(r)
-    })
-    .catch(err => { handleAPIError(req, res, err) })
-})
-
-app.get('/api/zadania/', (req, res) => {
-  if (!loggedIn(req)) {
-    res.redirect('/login/')
-    return
-  }
-  data[req.cookies.username].client
-    .praceDomowe(new Date())
-    .then(r => {
-      res.json(r)
-    })
-    .catch(err => { handleAPIError(req, res, err) })
-})
-
-app.get('/api/zadanie/:id/', (req, res) => {
-  if (!loggedIn(req)) {
-    res.redirect('/login/')
-    return
-  }
-  if (!req.params.id){
-    handleAPIError(req, res, 'Invalid homework ID')
-    return
-  }
-  data[req.cookies.username].client
-    .pracaDomowa(req.params.id)
-    .then(r => {
-      res.json(r)
-    })
-    .catch(err => { handleAPIError(req, res, err) })
-})
-
-app.get('/api/sprawdziany/', (req, res) => {
-  if (!loggedIn(req)) {
-    res.redirect('/login/')
-    return
-  }
-  data[req.cookies.username].client
-    .sprawdziany(typeof req.query.date === 'string' ? new Date(req.query.date) : new Date())
-    .then(r => {
-      res.json(r)
-    })
-    .catch(err => { handleAPIError(req, res, err) })
-})
-
-app.get('/api/wydarzenia/', (req, res) => {
-  if (!loggedIn(req)) {
-    res.redirect('/login/')
-    return
-  }
-  data[req.cookies.username].client
-    .wydarzenia()
-    .then(r => {
-      res.json(r)
-    })
-    .catch(err => { handleAPIError(req, res, err) })
-})
-
 function loggedIn (req) {
   return (typeof req.cookies.token === 'string' && typeof req.cookies.username === 'string' && typeof data[req.cookies.username] === 'object' && data[req.cookies.username].tokens.includes(req.cookies.token) && typeof data[req.cookies.username].client === 'object')
 }
@@ -375,18 +240,6 @@ function handleError (req, res, err) {
     return
   }
   res.render('error', {error: err})
-}
-
-function handleAPIError (req, res, err) {
-  if (err.toString().toLowerCase().includes('authentication failed.') || err.toString().toLowerCase().includes('unauthorized')) {
-    var index = data[req.cookies.username].tokens.indexOf(req.cookies.token)
-    delete data[req.cookies.username].tokens[index]
-    res.clearCookie('token')
-    res.clearCookie('username')
-    res.json({error: 'Sesja wygasła. Zaloguj się ponownie'})
-    return
-  }
-  res.json({error: err})
 }
 
 app.get('/js/:filename', (req, res) => { // TODO: fix
