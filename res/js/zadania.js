@@ -1,9 +1,8 @@
-var temp = '<tr><th>Przedmiot</th><th>Data zadania</th><th>Data oddania</th><th>Tytuł</th></tr>'
-
 request.get('/api/zadania/').then(zadania => {
 	zadania = zadania.body
 	console.log('zadania', zadania)
 	window.zadania = zadania
+	var temp = ''
 	zadania.ListK.forEach(zadanie => {
 		if(new Date(zadanie.dataO) > new Date()){
 			temp += `
@@ -18,7 +17,7 @@ request.get('/api/zadania/').then(zadania => {
 			`
 		}
 	})
-	if(temp.length === 83){
+	if(temp.length === 0){
 		temp += `
 			<tr>
 				<td colspan="4" style="text-align: center">Brak zadań domowych</td>
@@ -27,10 +26,10 @@ request.get('/api/zadania/').then(zadania => {
 	}
 	window.zadaniaRendered = temp
 	document.querySelector('#table').innerHTML = temp
-}).catch(alert)
+}).catch(console.error)
 
 function zadania_wszystkie(){
-	var temp = '<tr><th>Przedmiot</th><th>Data zadania</th><th>Data oddania</th><th>Tytuł</th></tr>'
+	var temp = ''
 	zadania.ListK.forEach(zadanie => {
 		temp += `
 			<tr>
@@ -43,7 +42,7 @@ function zadania_wszystkie(){
 			</tr>
 		`
 	})
-	if(temp.length === 84){
+	if(temp.length === 0){
 		temp += `
 			<tr>
 				<td colspan="4" style="text-align: center">Brak zadań domowych</td>
@@ -69,5 +68,5 @@ function zadanie(recordID){
 		`
 		$('#zadanie-modal').modal()
 		$('#zadanie-modal').modal('open')
-	}).catch(alert)
+	}).catch(console.error)
 }

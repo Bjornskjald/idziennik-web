@@ -12,7 +12,14 @@ html(lang='en')
 					a.btn.waves-effect.waves-light(href='javascript:zadania_nadchodzace()') Nadchodzące
 					br
 					br
-					table.striped#table
+					table.striped
+						thead
+							tr
+								th Przedmiot
+								th Data zadania
+								th Data oddania
+								th Tytuł
+						tbody#table
 			#zadanie-modal.modal
 				#zadanie.modal-content
 				.modal-footer
