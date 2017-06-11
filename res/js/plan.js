@@ -13,7 +13,7 @@ var $input = $('#date').pickadate({
 	formatSubmit: 'yyyy-mm-dd',
 	onSet: event => {
 		if (event.select) {
-			plan(picker.get('select', 'yyyy-mm-dd'))
+			plan(new Date(picker.get('select', 'yyyy-mm-dd')))
 		}
 	}
 })
@@ -21,8 +21,7 @@ var picker = $input.pickadate('picker')
 
 function plan(date){
 	var lekcje = []
-	date = typeof date === 'string' ? '?date=' + date : ''
-	request.get('/api/plan/'+date).then(plan => {
+	request.get('/api/plan/').query({date: date.getTime()}).then(plan => {
 		plan = plan.body
 		console.log('plan', plan)
 		var descBase = '<span style="color: #ff3300">'
@@ -78,4 +77,4 @@ function plan(date){
 	}).catch(console.error)
 }
 
-plan()
+plan(new Date())

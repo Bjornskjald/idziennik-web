@@ -19,7 +19,6 @@ function obecnosci (date) {
 		}
 	})
 	var picker = $input.pickadate('picker')
-	var date = typeof date === 'object' ? date : new Date()
 	var temp = ''
 	var miesiac = []
 	var offset = new Date(date.getFullYear(), date.getMonth(), 1).getDay()
@@ -86,4 +85,4 @@ function obecnosci (date) {
 	}).catch(console.error)
 }
 
-obecnosci()
+obecnosci(new Date())

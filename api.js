@@ -87,7 +87,7 @@ module.exports = function(data, app) {
       return
     }
     data[req.cookies.username].client
-      .obecnosci(typeof req.query.date === 'string' ? new Date(parseInt(req.query.date), 10) : new Date())
+      .obecnosci(typeof req.query.date === 'string' ? new Date(parseInt(req.query.date)) : new Date())
       .then(r => {
         res.json(r)
       })

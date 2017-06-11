@@ -31,7 +31,7 @@ request.get('/api/plan/').then(plan => {
 		return false
 	} else {
 		// Trzeba powtórzyć żądanie żeby pobrać plan na następny dzień (poniedziałek)
-		return request.get('/api/plan/').query({date: j.jsondate})
+		return request.get('/api/plan/').query({date: j.date.getTime()})
 	}
 }).then(plan => {
 	if (plan) {
@@ -56,7 +56,7 @@ request.get('/api/plan/').then(plan => {
 		document.querySelector('#jutro-sprawdziany').innerHTML = j.sprawdziany.length === 19 ? 'Brak sprawdzianów' : j.sprawdziany
 		return false
 	} else {
-		return request.get('/api/sprawdziany/').query({date: j.jsondate})
+		return request.get('/api/sprawdziany/').query({date: j.date.getTime()})
 	}
 }).then(sprawdziany => {
 	if (sprawdziany) {
