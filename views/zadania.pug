@@ -8,17 +8,14 @@ html(lang='en')
 		main
 			.container
 				.section
-					table.striped
-						tr
-							th Przedmiot
-							th Data zadania
-							th Data oddania
-							th Temat
-						each zadanie in zadania
-							tr
-								td!= zadanie.przed
-								td!= zadanie.dataZ
-								td!= zadanie.dataO
-								td
-									a(href="/zadanie/?id="+zadanie._recordId)= zadanie.tytul
+					a.btn.waves-effect.waves-light(href='javascript:zadania_wszystkie()') Wszystkie
+					a.btn.waves-effect.waves-light(href='javascript:zadania_nadchodzace()') Nadchodzące
+					br
+					br
+					table.striped#table
+			#zadanie-modal.modal
+				#zadanie.modal-content
+				.modal-footer
+					a.modal-action.modal-close.waves-effect.waves-green.btn-flat(href='#!') Zamknij
 		include templates/footer.pug
+		script(src="/js/zadania.js")
