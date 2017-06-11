@@ -205,7 +205,6 @@ app.get('/plan/', (req, res) => {
   res.render('plan', {name: req.cookies.username})
 })
 
-
 app.get('/zadania/', (req, res) => {
   if (!loggedIn(req)) {
     res.redirect('/login/')
@@ -397,22 +396,53 @@ app.get('/api/oceny/', (req, res) => {
     return
   }
   data[req.cookies.username].client
-  .oceny()
-  .then(res.json)
-  .catch(console.error)
+    .oceny()
+    .then(r => {
+      res.json(r)
+    })
+    .catch(err => { handleAPIError(req, res, err) })
 })
 
 app.get('/api/plan/', (req, res) => {
   if (!loggedIn(req)) {
-  res.redirect('/login/')
-  return
+    res.redirect('/login/')
+    return
   }
   data[req.cookies.username].client
-  .plan(typeof req.query.date === 'string' ? new Date(req.query.date) : new Date())
-  .then(plan => {
-    res.json(plan)
-  })
-  .catch(console.error)
+    .plan(typeof req.query.date === 'string' ? new Date(req.query.date) : new Date())
+    .then(r => {
+      res.json(r)
+    })
+    .catch(err => { handleAPIError(req, res, err) })
+})
+
+app.get('/api/zadania/', (req, res) => {
+  if (!loggedIn(req)) {
+    res.redirect('/login/')
+    return
+  }
+  data[req.cookies.username].client
+    .praceDomowe(new Date())
+    .then(r => {
+      res.json(r)
+    })
+    .catch(err => { handleAPIError(req, res, err) })
+})
+
+app.get('/api/zadanie/:id/', (req, res) => {
+  if (!loggedIn(req)) {
+    res.redirect('/login/')
+    return
+  }
+  if (!req.params.id){
+    throw new Error('Brak ID zadania.')
+  }
+  data[req.cookies.username].client
+    .pracaDomowa(req.params.id)
+    .then(r => {
+      res.json(r)
+    })
+    .catch(err => { handleAPIError(req, res, err) })
 })
 
 function loggedIn (req) {
@@ -438,6 +468,18 @@ function handleError (req, res, err) {
     return
   }
   res.render('error', {error: err})
+}
+
+function handleAPIError (req, res, err) {
+  if (err.toString().toLowerCase().includes('authentication failed.') || err.toString().toLowerCase().includes('unauthorized')) {
+    var index = data[req.cookies.username].tokens.indexOf(req.cookies.token)
+    delete data[req.cookies.username].tokens[index]
+    res.clearCookie('token')
+    res.clearCookie('username')
+    res.json({error: 'Sesja wygasła. Zaloguj się ponownie'})
+    return
+  }
+  res.json({error: err})
 }
 
 app.get('/js/:filename', (req, res) => { // TODO: fix
