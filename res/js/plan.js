@@ -20,17 +20,6 @@ var $input = $('#date').pickadate({
 var picker = $input.pickadate('picker')
 
 function plan(date){
-	document.querySelector('#table').innerHTML = 
-	`
-		<tr>
-			<th>Godziny</th>
-			<th>Poniedziałek</th>
-			<th>Wtorek</th>
-			<th>Środa</th>
-			<th>Czwartek</th>
-			<th>Piątek</th>
-		</tr>
-	`
 	var lekcje = []
 	date = typeof date === 'string' ? '?date=' + date : ''
 	request.get('/api/plan/'+date).then(plan => {
@@ -85,8 +74,8 @@ function plan(date){
 			}
 			temp += '</tr>'
 		})
-		document.querySelector('#table').innerHTML += temp
-	}).catch(alert)
+		document.querySelector('#table').innerHTML = temp
+	}).catch(console.error)
 }
 
 plan()

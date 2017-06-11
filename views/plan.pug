@@ -9,13 +9,15 @@ html(lang='en')
 			.container
 				.section
 					input(id="date", type="date", class="datepicker", placeholder="Data")
-					table.striped#table
-						tr
-							th Godziny
-							th Poniedziałek
-							th Wtorek
-							th Środa
-							th Czwartek
-							th Piątek
+					table.striped
+						thead
+							tr
+								th Godziny
+								th Poniedziałek
+								th Wtorek
+								th Środa
+								th Czwartek
+								th Piątek
+						tbody#table
 		include templates/footer.pug
 		script(src="/js/plan.js")
