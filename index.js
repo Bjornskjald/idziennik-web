@@ -339,6 +339,19 @@ app.get('/api/sprawdziany/', (req, res) => {
     .catch(err => { handleAPIError(req, res, err) })
 })
 
+app.get('/api/wydarzenia/', (req, res) => {
+  if (!loggedIn(req)) {
+    res.redirect('/login/')
+    return
+  }
+  data[req.cookies.username].client
+    .wydarzenia()
+    .then(r => {
+      res.json(r)
+    })
+    .catch(err => { handleAPIError(req, res, err) })
+})
+
 function loggedIn (req) {
   return (typeof req.cookies.token === 'string' && typeof req.cookies.username === 'string' && typeof data[req.cookies.username] === 'object' && data[req.cookies.username].tokens.includes(req.cookies.token) && typeof data[req.cookies.username].client === 'object')
 }
